@@ -1,0 +1,2696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>零碳工厂生态图谱 · 信贷业务互动学习版</title>
+<style>
+  :root{
+    --up:#2e9e4f; --mid:#1565c0; --fin:#00897b; --down:#7cb342; --risk:#00695c;
+    --ink:#243029; --bg:#f3faf4; --card:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+    background:radial-gradient(circle at 50% 22%,#ffffff 0%,var(--bg) 72%);
+    color:var(--ink);min-height:100vh;padding:22px 12px 70px;}
+  header{text-align:center;}
+  h1{font-size:28px;color:#1b5e20;letter-spacing:3px;}
+  .sub{color:#5f7468;font-size:13.5px;margin-top:6px;letter-spacing:1px;}
+  .toolbar{max-width:960px;margin:14px auto 4px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;}
+  .toolbar input{padding:8px 12px;border:1px solid #cfe0d4;border-radius:20px;width:230px;font-size:13px;outline:none;}
+  .toolbar input:focus{border-color:var(--up);}
+  .btn{border:1px solid #cfe0d4;background:#fff;color:#2e6b3e;padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;transition:.15s;}
+  .btn:hover{background:#eef7f0;}
+  .btn.on{background:var(--up);color:#fff;border-color:var(--up);}
+  .progress{max-width:960px;margin:6px auto 0;display:flex;align-items:center;gap:10px;font-size:13px;color:#5f7468;justify-content:center;}
+  .bar{flex:0 0 220px;height:9px;background:#e2ede4;border-radius:6px;overflow:hidden;}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#43a047,#00897b);transition:width .3s;}
+  .stage{display:flex;justify-content:center;margin-top:8px;}
+  svg{max-width:960px;width:100%;height:auto;display:block;}
+  .node{cursor:pointer;}
+  .node .nbg{transition:transform .16s ease,filter .16s ease;transform-origin:center;transform-box:fill-box;}
+  .node:hover .nbg{transform:scale(1.13);filter:drop-shadow(0 5px 9px rgba(0,0,0,.18));}
+  .node .ico{font-size:25px;pointer-events:none;user-select:none;}
+  .nlabel{font-size:11.5px;fill:#33463b;pointer-events:none;}
+  .blabel{font-size:15px;font-weight:bold;fill:#fff;letter-spacing:2px;pointer-events:none;}
+  .center-title{font-size:25px;font-weight:bold;fill:#1b5e20;letter-spacing:3px;}
+  #centerG{cursor:pointer;}
+  #centerG:hover .cc{filter:drop-shadow(0 0 14px rgba(76,175,80,.5));}
+
+  /* 弹窗 */
+  .mask{position:fixed;inset:0;background:rgba(18,38,28,.46);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .mask.show{display:flex;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .panel{background:#fff;border-radius:18px;max-width:660px;width:100%;max-height:90vh;overflow-y:auto;
+    box-shadow:0 24px 60px rgba(0,0,0,.28);animation:pop .22s ease;}
+  @keyframes pop{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+  .phead{padding:22px 26px 16px;color:#fff;border-radius:18px 18px 0 0;position:relative;}
+  .phead h2{font-size:22px;letter-spacing:1px;}
+  .phead .en{font-size:12px;opacity:.85;margin-top:3px;letter-spacing:1px;}
+  .phead .tag{display:inline-block;font-size:12px;background:rgba(255,255,255,.22);padding:3px 11px;border-radius:20px;margin-top:9px;letter-spacing:1px;}
+  .phead .nav{position:absolute;top:18px;right:54px;display:flex;gap:6px;}
+  .phead .nav button{width:30px;height:30px;border:none;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-size:15px;cursor:pointer;}
+  .phead .nav button:hover{background:rgba(255,255,255,.42);}
+  .close{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-size:18px;cursor:pointer;line-height:1;}
+  .close:hover{background:rgba(255,255,255,.42);}
+  .pbody{padding:18px 26px 26px;}
+  .sec{font-size:13px;color:#7a8a80;letter-spacing:2px;margin:18px 0 9px;border-left:4px solid var(--up);padding-left:8px;}
+  .desc{font-size:14.5px;line-height:1.9;color:#36453d;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px;}
+  .kpi{background:#f3f8f4;border-radius:12px;padding:11px 13px;border:1px solid #e2ede4;}
+  .kpi .v{font-size:18px;font-weight:bold;color:#1b5e20;}
+  .kpi .v small{font-size:11px;font-weight:normal;color:#7a8a80;margin-left:2px;}
+  .kpi .k{font-size:11.5px;color:#6b7f72;margin-top:3px;line-height:1.4;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tags span{background:#e7f1fb;color:#1565c0;border:1px solid #cfe0f2;padding:5px 12px;border-radius:18px;font-size:12.5px;}
+  ul.pts{list-style:none;}
+  ul.pts li{font-size:14px;line-height:1.85;padding-left:20px;position:relative;color:#36453d;}
+  ul.pts li::before{content:"▸";position:absolute;left:2px;color:var(--up);}
+  .risk-box{background:#fff8ef;border:1px solid #f3e0c4;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.85;color:#8a5a1e;}
+  .risk-box b{color:#c46a10;}
+  .quiz{background:#eef6ff;border:1px solid #d3e6fb;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.8;color:#1d4e79;}
+  .case{background:#f4f0ff;border:1px solid #e0d6fb;border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.85;color:#4a3a86;}
+  .foot{font-size:11.5px;color:#a5b3aa;margin-top:16px;text-align:right;}
+  .learned-btn{margin-top:16px;width:100%;padding:11px;border:none;border-radius:12px;background:#e2ede4;color:#2e6b3e;font-size:14px;cursor:pointer;letter-spacing:1px;transition:.15s;}
+  .learned-btn.done{background:var(--up);color:#fff;}
+
+  /* 概览卡 */
+  .overview{max-width:1080px;margin:26px auto 0;}
+  .ov-title{text-align:center;font-size:17px;color:#1b5e20;letter-spacing:2px;margin-bottom:14px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .ocard{background:var(--card);border:1px solid #e3ede5;border-radius:14px;padding:13px 14px;cursor:pointer;transition:.15s;border-left:5px solid #ccc;}
+  .ocard:hover{box-shadow:0 6px 16px rgba(0,0,0,.08);transform:translateY(-2px);}
+  .ocard .oc-h{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:bold;color:#2c3a31;}
+  .ocard .oc-h .emoji{font-size:20px;}
+  .ocard .oc-d{font-size:12.5px;color:#6b7f72;line-height:1.65;margin-top:7px;}
+  .ocard .oc-tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:12px;color:#fff;margin-top:9px;}
+  .ocard.done{background:#f1faf2;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:18px auto 0;font-size:12.5px;color:#5f7468;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+
+  /* 客户经理日记时间线 */
+  .tl-toggle{margin:2px 0 8px;}
+  .timeline{border-left:2px dashed #cfe0d4;margin-left:34px;padding-left:22px;}
+  .timeline.collapsed{display:none;}
+  .tl-item{position:relative;margin-bottom:15px;}
+  .tl-item::before{content:"";position:absolute;left:-27px;top:6px;width:10px;height:10px;border-radius:50%;background:#2e9e4f;}
+  .tl-num{position:absolute;left:-52px;top:-2px;width:26px;height:26px;border-radius:50%;background:#2e9e4f;color:#fff;font-size:12px;line-height:26px;text-align:center;font-weight:bold;}
+  .tl-body b{font-size:14px;color:#1b5e20;}
+  .tl-body p{font-size:13.6px;line-height:1.85;color:#36453d;margin-top:3px;}
+
+  /* ===== AI节能商业全景总览 ===== */
+  .panorama{max-width:1080px;margin:16px auto 0;background:linear-gradient(135deg,#eef7f0,#eaf3fb);
+    border:1px solid #dceadf;border-radius:16px;padding:18px 22px;}
+  .panorama h3{font-size:16.5px;color:#1b5e20;letter-spacing:2px;margin-bottom:8px;text-align:center;}
+  .panorama p{font-size:13.8px;line-height:2.0;color:#33463b;text-align:justify;}
+  .panorama .chain{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;}
+  .panorama .chain span{background:#fff;border:1px solid #cfe0d4;border-radius:20px;padding:5px 14px;font-size:12.5px;color:#2e6b3e;font-weight:bold;}
+  /* ===== 详情面板：卡片流编辑器 ===== */
+  .ailink{font-size:13px;line-height:1.7;background:rgba(255,255,255,.18);border-radius:10px;padding:8px 12px;margin-top:10px;}
+  .gbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;}
+  .gbtn{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.16);color:#fff;
+    padding:6px 13px;border-radius:18px;font-size:12.5px;cursor:pointer;transition:.15s;letter-spacing:1px;}
+  .gbtn:hover{background:rgba(255,255,255,.34);}
+  .gbtn.warn{border-color:#f3c4a0;background:#fff3e6;color:#b25e00;}
+  .card{background:#fff;border:1px solid #e3ede5;border-radius:14px;margin-bottom:14px;overflow:hidden;
+    box-shadow:0 2px 8px rgba(20,60,35,.05);}
+  .card-t{font-size:15px;font-weight:bold;color:#1b5e20;padding:11px 15px;background:#f3f8f4;
+    border-bottom:1px solid #e3ede5;outline:none;}
+  .card-x{font-size:13.8px;line-height:1.95;color:#33463b;padding:12px 15px;white-space:pre-wrap;outline:none;}
+  .card-t:focus,.card-x:focus{background:#fffdf2;box-shadow:inset 0 0 0 2px #ffe9a8;}
+  .card-b{display:flex;gap:8px;padding:0 15px 12px;}
+  .card-b button{border:1px solid #cfe0d4;background:#fff;color:#2e6b3e;padding:5px 13px;border-radius:16px;
+    font-size:12px;cursor:pointer;transition:.15s;}
+  .card-b button:hover{background:#eef7f0;}
+  .card-b button.del{border-color:#f0d0c0;color:#c05a00;}
+  .card-b button.del:hover{background:#fff3e6;}
+  .addcard{background:#f7fbf8;border:1.5px dashed #b9d4c0;border-radius:14px;padding:14px 16px;margin:6px 0 4px;}
+  .addcard input,.addcard textarea{width:100%;border:1px solid #cfe0d4;border-radius:10px;padding:9px 12px;
+    font-size:13.5px;font-family:inherit;outline:none;margin-bottom:9px;background:#fff;}
+  .addcard input:focus,.addcard textarea:focus{border-color:var(--up);}
+  .addcard textarea{min-height:74px;resize:vertical;line-height:1.7;}
+  .addcard button{border:none;background:var(--up);color:#fff;padding:9px 22px;border-radius:20px;font-size:13.5px;cursor:pointer;}
+  .attach{margin-top:16px;border-top:1px dashed #d7e6da;padding-top:12px;}
+  .attach .at-t{font-size:13px;color:#7a8a80;letter-spacing:2px;margin-bottom:8px;}
+  .attach a{display:inline-block;margin:0 10px 8px 0;font-size:12.8px;color:#1565c0;text-decoration:none;
+    border:1px solid #cfe0f2;background:#eef6ff;border-radius:16px;padding:5px 14px;}
+  .attach a:hover{background:#dceafc;}
+  .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#243029;color:#fff;
+    font-size:13.5px;padding:10px 22px;border-radius:22px;opacity:0;pointer-events:none;transition:.25s;z-index:99;}
+  .toast.show{opacity:.94;}
+  .ocard .oc-d{min-height:40px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>零碳工厂生态图谱</h1>
+  <div class="sub">AI节能内容库 · 在线编辑版 — 点击任意图标，展开AI节能主线、金融接口、补贴免税与风险要点，可即时编辑保存</div>
+</header>
+
+<div class="toolbar">
+  <input id="search" placeholder="🔍 搜索节点 / 产品 / 风险关键词…">
+  <button class="btn" id="enBtn">中英对照</button>
+  <button class="btn" id="resetBtn">重置进度</button>
+  <button class="btn" id="jsonBtn">导出节点数据(JSON)</button>
+</div>
+
+<div class="progress">
+  <span id="pgText">已学习 0 / 19</span>
+  <span class="bar"><i id="pgBar"></i></span>
+</div>
+
+
+<div class="panorama">
+  <h3>🌐 AI节能商业全景 · 六环一链</h3>
+  <p>零碳工厂是目标，AI节能算法是引擎，虚拟电厂是市场出口，绿色信贷是资金血液，补贴申报与免税政策是利润放大器——六者构成一条完整商业链：工厂先用AI算法把空压、空调、产线负荷、储能充放的系统冗余挤出来（节能率通常8%~35%），形成可核证的节能量与绿电；虚拟电厂平台把这些柔性资源聚合参与需求响应与电力市场，赚取第二收入；银行以可测算现金流与收益权质押提供EMC贷款、固定资产贷款、碳质押与绿色激励贷，央行碳减排支持工具（按本金60%、利率1.75%）把资金成本打到最低；改造投入同时撞开三扇政策之门——福州/厦门按吨标煤500元的节能补助与低零碳工厂奖励、专用设备数智化改造10%所得税抵免（2024~2027）、EMC三免三减半与免征增值税。AI不仅省电，更让每一度省下的电、每一吨减掉的碳都可核算、可质押、可交易、可报销——这就是零碳工厂从成本中心走向利润中心的完整逻辑。</p>
+  <div class="chain">
+    <span>🏭 零碳工厂</span><span>➜</span><span>🧠 AI节能算法</span><span>➜</span><span>⚡ 虚拟电厂运营</span>
+    <span>➜</span><span>🏦 绿色信贷</span><span>➜</span><span>🎁 补贴申报</span><span>➜</span><span>🧾 免税政策</span>
+  </div>
+</div>
+
+<div class="stage">
+  <svg id="map" viewBox="0 0 920 920" aria-label="生态图谱"></svg>
+</div>
+
+<div class="legend">
+  <span><i style="background:var(--up)"></i>上游：清洁能源供给</span>
+  <span><i style="background:var(--mid)"></i>中游：运营与数字化</span>
+  <span><i style="background:var(--fin)"></i>金融服务：银行配套</span>
+  <span><i style="background:var(--down)"></i>下游：收益与客户</span>
+  <span><i style="background:var(--risk)"></i>风险要点</span>
+  <span><i style="background:#e8912d"></i>政策补贴：支持与激励</span>
+</div>
+
+<div class="overview">
+  <div class="ov-title">📚 全部节点一览（点击同样可展开学习）</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<style>
+  .glossary{max-width:1080px;margin:34px auto 0;}
+  .glossary .gl-title{text-align:center;font-size:17px;color:#1b5e20;letter-spacing:2px;margin-bottom:6px;}
+  .glossary .gl-sub{text-align:center;font-size:12.5px;color:#7a8a80;margin-bottom:16px;}
+  .g-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+  .g-term{background:#fff;border:1px solid #e3ede5;border-radius:12px;padding:12px 15px;}
+  .g-term b{display:block;font-size:14px;color:#1b5e20;}
+  .g-term b i{font-style:normal;color:#8a9a90;font-size:11.5px;font-weight:normal;margin-left:6px;}
+  .g-term span{display:block;font-size:12.8px;color:#3c4a42;line-height:1.75;margin-top:5px;}
+  .path{max-width:1080px;margin:34px auto 0;background:linear-gradient(135deg,#f1f8f2,#eaf3fb);border:1px solid #dceadf;border-radius:16px;padding:20px 22px;}
+  .path h3{font-size:16px;color:#1b5e20;letter-spacing:2px;margin-bottom:12px;text-align:center;}
+  .path-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .pstep{background:#fff;border-radius:12px;padding:13px 15px;border-left:4px solid #2e9e4f;}
+  .pstep .n{font-size:11px;color:#8a9a90;letter-spacing:1px;}
+  .pstep b{display:block;font-size:14px;color:#2c3a31;margin:3px 0 5px;}
+  .pstep span{font-size:12.5px;color:#5f7468;line-height:1.7;}
+</style>
+
+<div class="glossary">
+  <div class="gl-title">📖 信贷业务术语速查（初学者友好）</div>
+  <div class="gl-sub">括号内为白话解释；点上方图标可看到每个术语在真实业务里怎么用</div>
+  <div class="g-grid">
+    <div class="g-term"><b>绿色信贷<i>Green Credit</i></b><span>资金用途符合环保、节能、清洁能源等绿色方向的贷款，通常在利率与统计上享有政策支持（相当于银行支持『绿色项目』的专属贷款类别）。</span></div>
+    <div class="g-term"><b>固定资产贷款<i>Fixed-Asset Loan</i></b><span>用于企业建造或购置厂房、设备等固定资产的贷款，期限较长、按项目或资产还款（相当于『买大件分期付款』）。</span></div>
+    <div class="g-term"><b>项目贷款<i>Project Loan</i></b><span>以项目自身未来现金流为主要还款来源的贷款，股东只承担有限责任（相当于『看项目造血能力放贷，不靠老板担保』）。</span></div>
+    <div class="g-term"><b>供应链金融<i>Supply Chain Finance, SCF</i></b><span>围绕一家信用好的核心企业，为其上下游供应商/客户提供基于真实贸易的融资（相当于『大树底下好乘凉，借核心企业的信用融资』）。</span></div>
+    <div class="g-term"><b>融资租赁<i>Financial Leasing</i></b><span>由租赁公司出钱买设备、租给企业使用，企业付租金，期满可留购（相当于『以租代购，缓解一次性付款压力』）。</span></div>
+    <div class="g-term"><b>收益权质押<i>Revenue-Rights Pledge</i></b><span>把未来的电费、节能收益等收款权质押给银行作为担保（相当于『用将来的现金流做抵押』）。</span></div>
+    <div class="g-term"><b>质押率<i>Loan-to-Value, LTV</i></b><span>贷款金额占质押物市值的比例；质押物越易波动、越难变现，质押率越低（相当于『抵押物打折后能贷几成』）。</span></div>
+    <div class="g-term"><b>贷款成数</b><span>贷款占项目总投资的比例，其余为自有资金（资本金）。常见七成左右（相当于『首付三成、贷款七成』）。</span></div>
+    <div class="g-term"><b>DSCR<i>Debt Service Coverage Ratio</i></b><span>偿债覆盖率=可还本付息现金流÷到期本息；一般要求≥1.2，越高越安全（相当于『收入够还几倍月供』）。</span></div>
+    <div class="g-term"><b>IRR<i>Internal Rate of Return</i></b><span>内部收益率，衡量项目自身盈利能力的核心指标（相当于『项目本身的年化回报率』）。</span></div>
+    <div class="g-term"><b>PPA<i>Power Purchase Agreement</i></b><span>购电协议，买卖双方约定长期电量与电价的合同（相当于『长期供电合同，锁量锁价』）。</span></div>
+    <div class="g-term"><b>绿证<i>GEC, Green Electricity Certificate</i></b><span>绿电的环境价值凭证，每 1000 度绿电核发一张，可出售（相当于『绿电的『绿色身份』可以单独卖钱』）。</span></div>
+    <div class="g-term"><b>碳配额<i>CEA, Carbon Allowance</i></b><span>碳市场分配给控排企业的排放许可，不够要买、余了可卖（相当于『排污的『额度』，成了可交易的资产』）。</span></div>
+    <div class="g-term"><b>CCER</b><span>国家核证自愿减排量，来自可再生能源等项目，经核证可抵销最多 5% 的配额清缴（相当于『减排量的『代金券』』）。</span></div>
+    <div class="g-term"><b>碳质押融资<i>Carbon Pledge Finance</i></b><span>以碳配额或 CCER 作质押发放的贷款（相当于『把碳资产当抵押物借钱，而不用卖掉它』）。</span></div>
+    <div class="g-term"><b>碳履约保函<i>Carbon Performance Guarantee</i></b><span>银行出具的担保，让企业用银行信用替代现金保证金参与碳市场履约（相当于『银行替你担保，不用先交现金』）。</span></div>
+    <div class="g-term"><b>峰谷价差<i>Peak-Valley Price Spread</i></b><span>用电高峰与低谷的电价之差，是储能套利空间来源（相当于『低买高卖的差价空间』）。</span></div>
+    <div class="g-term"><b>需量管理<i>Demand Management</i></b><span>压低工厂最高用电功率以降低按容量收取的基本电费（相当于『别同时开太多大功率设备，少交『容量费』』）。</span></div>
+    <div class="g-term"><b>需求响应<i>Demand Response</i></b><span>电网紧张时让企业少用电，企业获得补偿（相当于『电网喊你省电，省了给你发补贴』）。</span></div>
+    <div class="g-term"><b>虚拟电厂<i>VPP, Virtual Power Plant</i></b><span>把分散的负荷、储能、分布式电源聚合起来统一参与电力市场（相当于『把散户打包成一个『电厂』去交易』）。</span></div>
+    <div class="g-term"><b>EMC / ESCO</b><span>合同能源管理／节能服务公司：ESCO 出钱改造、与企业分享节能收益（相当于『别人出钱帮你节能，省下的钱一起分』）。</span></div>
+    <div class="g-term"><b>M&V<i>Measurement & Verification</i></b><span>节能量测量与验证，用专业方法证明『到底省了多少能』（相当于『节能效果的第三方验货』）。</span></div>
+    <div class="g-term"><b>敏感性分析<i>Sensitivity Analysis</i></b><span>测算关键变量（电价、利用小时、碳价）变动时项目还款能力的变化（相当于『万一情况变差，还扛得住吗』）。</span></div>
+    <div class="g-term"><b>ESG 挂钩贷款<i>ESG-Linked Loan</i></b><span>把利率与企业的环境/社会/治理绩效 KPI 挂钩的贷款（相当于『表现好降息、不达标回调』）。</span></div>
+    <div class="g-term"><b>尽调<i>Due Diligence</i></b><span>授信前对客户与项目的全面调查核实（相当于『借钱前把对方查个底朝天』）。</span></div>
+    <div class="g-term"><b>CBAM<i>欧盟碳边境调节机制</i></b><span>欧盟对进口高碳产品征收的调节机制，倒逼出口企业提供产品碳足迹（相当于『出口到欧盟要交『碳关税』，先得算清碳账』）。</span></div>
+  </div>
+</div>
+
+<div class="path">
+  <h3>🎓 初学者四步学习路径</h3>
+  <div class="path-steps">
+    <div class="pstep"><div class="n">STEP 1</div><b>建立框架</b><span>先点开中心的「零碳工厂」，再沿 上游→中游→金融服务→下游→风险 通读一遍，弄清钱、能、碳如何流转。</span></div>
+    <div class="pstep"><div class="n">STEP 2</div><b>吃透金融</b><span>重点精读「金融服务」三个节点，对照下方术语表，掌握额度、期限、利率、担保、质押率怎么定。</span></div>
+    <div class="pstep"><div class="n">STEP 3</div><b>带着风险看</b><span>重看每个节点时，重点读「风险关注要点」与「审批/尽调要点」，养成先想风险再看收益的习惯。</span></div>
+    <div class="pstep"><div class="n">STEP 4</div><b>案例与自测</b><span>读完每个「案例速览」后，先答自测题再看「参考要点」，全部标记已掌握即完成入门。</span></div>
+  </div>
+</div>
+
+<!-- 详情弹窗：卡片流编辑器 -->
+<div class="mask" id="mask">
+  <div class="panel">
+    <div class="phead" id="pHead">
+      <div class="nav">
+        <button onclick="navNode(-1)" title="上一个">‹</button>
+        <button onclick="navNode(1)" title="下一个">›</button>
+      </div>
+      <button class="close" onclick="closePanel()">✕</button>
+      <h2 id="pTitle"></h2>
+      <div class="en" id="pEn"></div>
+      <div class="ailink" id="pAiLink"></div>
+      <span class="tag" id="pTag"></span>
+      <div class="gbtns">
+        <button class="gbtn" onclick="saveData()">💾 保存</button>
+        <button class="gbtn" onclick="exportJSON()">⬇ 导出JSON</button>
+        <button class="gbtn" onclick="document.getElementById('importFile').click()">⬆ 导入JSON</button>
+        <button class="gbtn" onclick="exportHTML()">🌐 导出新版HTML</button>
+        <button class="gbtn warn" onclick="resetData()">♻ 重置</button>
+      </div>
+    </div>
+    <div class="pbody" id="pBody"></div>
+  </div>
+</div>
+<input type="file" id="importFile" accept=".json,application/json" style="display:none">
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 数据层 ================= */
+const graphData = {
+ "节能改造EPC": {
+  "category": "上游",
+  "aiLink": "AI 把空压站、制冷站从『凭经验开关机』变成『按需供能』，是公辅车间节能率最高、回收最快的一环。",
+  "attachments": [
+   {
+    "name": "公辅车间AI智控改造方案模板.pdf",
+    "url": "./assets/epc-ai-retrofit-plan.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "节能量测量与验证(M&V)方案指南.pdf",
+    "url": "./assets/epc-mv-guide.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "空压站房能源审计基线表.xlsx",
+    "url": "./assets/epc-audit-baseline.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "节能改造 EPC（Engineering Procurement Construction，设计—采购—施工总承包；实践中常与 EMC 合同能源管理混用）是工厂『从源头降耗』的工程手段——不改变能源来源，而是让同样的产出消耗更少的电、气、热。改造后省下的能源费用会逐年沉淀，既降低产品碳足迹，又形成可测算、可授信的现金流。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『供需匹配+多约束优化』：在空压机、干燥机、水泵、冷却塔等关键节点加装智能物联网关，实时采集排气压力、流量、含油含水量等上百个参数，用负荷预测模型预判车间用气/用冷波动，再以多参数多约束条件控制算法动态调整设备启停组合、加载率与管网压力带，把『大马拉小车』『压力带过宽』『频繁加卸载』三类冗余全部挤掉。行业公开实测：蘑菇物联 AI 云智控在鞍钢朝阳钢铁空压站节能 11.83%（年省电费约 380 万元、年减碳 1929 吨），白云山制药总厂节能 25%，天友乳业经智控+管网改造累计节能 32%，纺织头部企业站房能耗从 0.142 降到 0.1263 kW·h/Nm³（节能 11.06%），金属结构企业单位能耗节能率最高 35.3%；工业空压机系统耗电量约占全国总发电量 6%~9%，是仅次于风机、水泵的第三大耗电设备。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：站房加装智能物联网关（压力/流量/温度/电量/电流全采集）→ 边缘计算盒子本地闭环控制 → 云端 AI 模型每周迭代策略；不动主机本体，先智控后技改，风险低。\n2. 硬件清单：压力传感器、流量计、电能表、边缘控制柜、变频器（如需）、物联网关；软件：AI 群控平台 + 手机巡检 App。\n3. 软件与接口：平台侧提供 Modbus TCP/RTU、OPC UA 接口，直接对接客户 DCS/PLC；数据可回传银行能效监测系统做贷后监管。\n4. 实施步骤：能源审计（1~2 周）→ 基线标定（M&V 方案备案）→ 设备安装与联调（2~4 周）→ 双轨试运行（人工+AI 并行 1 个月）→ 全面切换。\n5. 预期节能率：智控单项 8%~15%，叠加管网改造与低能效设备淘汰可达 20%~35%；投资回收期通常 1.5~3 年。\n6. 数据采集方式：15 秒级采集运行参数，日级生成能效报告；节能量按 GB/T 24915 与 M&V 方案核算，作为补助与分成的唯一依据。\n7. 可执行颗粒度：以 10 台 75kW 空压机站房为例，改造投资约 45~60 万元，年节电约 90~120 万 kWh，按 0.7 元/kWh 计年省 63~84 万元。\n8. 准入与合规：产品优先选入《国家工业和信息化领域节能技术装备推荐目录》的厂商，便于申报节能改造补助。\n【业务定义】EPC 指节能服务公司（ESCO，Energy Service Company）把电机、空压机、制冷站、蒸汽系统、照明等高耗能环节打包改造。付款有两种主流模式：①EPC 总包式——工厂先出资、按工程节点付款；②EMC 合同能源管理式——ESCO 全额垫资、工厂『零首付』，双方按约定比例分享改造后的节能收益（分享期一般 3~6 年）。对银行而言，EMC 模式下『未来的节能收益』可以被确权、计量并质押，因而成为一笔可授信的资产。\n【信贷切入点】信贷切入点在于『收益可预测、可确权』。改造前先做能源审计（摸清电、气、热、煤的流向与浪费点，相当于给工厂做一次『能效体检』），改造后由第三方做节能量核证。银行以核证报告为锚，把分享期内的节能收益权质押给银行，据此向 ESCO 或工厂发放项目贷款。这既是绿色信贷（资金用途绿色），又是典型的供应链金融（围绕 ESCO 与工厂的合同关系）。\n【关键数据】5~20%（单位产品能耗降幅（工艺不同差异大，纺织、造纸通常高于装备制造））；3~6年（效益分享期（银行放款期限宜短于分享期，留安全边际））；ESCO（实施主体（Energy Service Company，节能服务公司））\n【适用场景】高耗能工序明确、节能量可第三方核证的工厂（如陶瓷、纺织、造纸、冶金）；客户信用良好但不愿一次性大额投入技改资金（EMC 零首付正好解此痛点）；园区或集团做整体节能托管，打包多家工厂批量授信（摊薄尽调成本、复制风控模型）"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】该节点首选合同能源管理贷款：ESCO 全额垫资、工厂零首付，银行以节能效益分享款为第一还款来源、以分享期收益权质押，额度约总投资 70%、期限 3~8 年。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】改造项目属福州节能改造补助范围：年节能量≥150 吨标煤按 500 元/吨补助、单企业年度最高 500 万元；智控软件投入符合专用设备数智化改造 10% 抵免条件的可另行抵免。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】节能量未达约定（改造效果不及测算，分享款随之缩水）；客户经营恶化拒付分享款；计量口径与归属纠纷（改造前后的能耗基准线说不清，容易扯皮）；ESCO 资质弱、后续运维跟不上导致节能效果逐年衰减。\n【新增风险与应对】执行风险：节能量不及测算（应对：M&V 基线双方案、分期放款与核证节点绑定）；设备老化能效偏移（应对：改造前能效评估、淘汰清单）；计量口径纠纷（应对：合同约定基准线算法与争议检测机构）。数据合规：站房运行数据涉及生产工艺参数，应签署数据保密协议、本地化部署选项。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "上游起点：EPC/EMC 为工厂做能效体检与改造，产出『可核证的节能量』；下游接 EMS 能源管理（持续优化）、储能配套（移峰填谷）、碳管理系统（把节能量折算碳减排量进入碳资产）；金融端用改造后的节能收益权质押融资，形成『诊断—改造—智控—确权—融资』闭环。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某纺织厂的空压站与蒸汽系统改造：总投资 1200 万元，ESCO 以分享期 5 年的节能收益权质押，获得银行项目贷款 840 万元（七成）。改造后年节电费约 260 万元，工厂零首付，用省下的电费按约定比例归还分享款；银行按『改造完成→核证达标』分两期放款，核证不达标则暂缓二期，风险可控。\n【自测题】若客户否认节能量达标、拒付分享款，银行应主要依据哪份文件与什么机制来保障收款？\n【参考要点】看 EMC 合同的分享与违约条款，加上第三方 M&V 核证报告；可通过逾期加收、设备留置、加速到期等救济手段兜底。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：翻开支行梳理的制造业节能改造名单，我用准入清单逐户比对：是否属于高耗能行业、技改项目是否已备案、节能量能否第三方核证。三家陶瓷、纺织类企业入围；某五金厂因项目尚未备案、节能量无从核证，先剔除，锁定纺织厂为重点触达对象。\n2. 电话初步建联沟通：拨通纺织厂李总电话，简要说明我行绿色信贷对节能改造有利率优惠和额度倾斜，询问其空压与蒸汽系统改造的资金缺口。对方坦承ESCo报价1200万、自有资金只够出三成，确有合作意向，遂约下周现场拜访。\n3. 现场初次拜访调研：进厂后先看空压站和老锅炉的运行记录，又翻了近半年能耗账单。李总带我看车间，说改造后年可省电费约260万，但担心节能量说不清、银行不认。我留下《绿色信贷产品手册》和资料清单，约定补充能源审计报告。\n4. 全面尽职调查核验：调阅近三年财报和用电流水，现场核对电表与产线，并引入第三方做M&V（节能量测量与验证）预评估，确认基准线与节能量算法可靠。还款来源落在分享期节能收益上，我逐项核验ESCo资质与合同条款，形成尽调底稿。\n5. 定制化授信方案洽谈：结合项目特点，匹配『合同能源管理融资』：额度840万、七成，期限5年、与分享期匹配，利率按绿色信贷优惠执行，以节能收益权质押。李总关心分期，我把放款与核证节点绑定，双方敲定核心条款。\n6. 授信报告撰写与申报：撰写授信调查报告，附能源审计报告、M&V预评估、ESCo合同、财务报表与用电流水，按流程提交支行并上报分行，说明第一还款来源为节能收益权、担保为收益权质押加设备抵押。\n7. 风险审查与绿色专项审核：风控部做常规审查，同时绿色专项岗核查节能效益真实性：复核基准线、节能量算法与ESCo资质，确认项目符合绿色目录。审查意见提示关注客户拒付与计量纠纷风险，建议设置加速到期条款。\n8. 授信审批与出具批复：提交审贷会审议，委员关注分享期现金流稳定性与ESCo履约能力。补充说明后获批：额度840万、期限5年、收益权质押，并要求核证达标作为二期放款前提，正式出具授信批复。\n9. 合同签署与担保落实：与纺织厂、ESCo签订借款合同、质押合同（节能收益权）及设备抵押合同，办妥质押登记；同时确认改造合同、验收标准与设备归属条款齐备，李总签约时再次确认分享比例与结算路径。\n10. 放款条件核验与贷款发放：核验前提条件：改造完成、设备安装到位、M&V首期核证达标、质押登记生效，遂发放首期贷款并受托支付至ESCo工程款账户，资金直达项目、不被挪用。\n11. 贷后全流程管理：按月监测结算电费账户回行情况，每季度看一次节能数据、核验分享款到账。一次发现某月节能量下滑，现场排查为新增产线所致，判断不影响整体，出具贷后报告并持续跟踪降碳目标达成。\n12. 到期结清与业务循环：分享期满、贷款本息结清。ESCo续约为李总做二期余热改造，我行顺势重启授信并予额度倾斜，形成『改造—融资—再改造』的长期合作闭环。"
+   }
+  ]
+ },
+ "分布式光伏(屋顶)": {
+  "category": "上游",
+  "aiLink": "AI 让光伏电站从『被动运维』变『主动预防』，多发 1% 的电、少跑 80% 的现场。",
+  "attachments": [
+   {
+    "name": "分布式光伏AI运维产品简介.pdf",
+    "url": "./assets/roof-pv-ai-om.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "屋顶荷载鉴定与并网资料清单.pdf",
+    "url": "./assets/roof-load-grid-checklist.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "分布式光伏（Distributed PV）是利用厂房屋顶、车棚、闲置地面建设的光伏电站，遵循『自发自用、余电上网』原则，是工厂降碳与降本的第一能源资产，也是绿色信贷中最成熟、最易标准化的标的。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『出力预测+组件级诊断+智能跟踪』：①智能 IV 诊断——华为 FusionSolar 智能 IV 诊断获鉴衡 CGC 最高 L4 等级认证，100MW 电站全量组串扫描从传统人工抽检两周（第三方报价约 20 万元）缩短到 10~25 分钟自动出报告，组件级故障定位准确率≥96%、运维效率提升 80%；②AI BOOST——基于神经网络的跟踪支架角度优化，安徽濉溪实测 183 天提升发电量 1.31% 以上，双面组件+跟踪支架+多路 MPPT 融合额外提升 0.5%~1%；③功率预测——辐照与云图预测指导次日发电计划与负荷安排。厦门 ABB 工业中心案例：10 万㎡屋顶光伏+配套智慧能源管理平台，融资 3500 万元（其中 1800 万元为人行碳减排支持工具、利率 1.75%），项目为厂区提供一半自用电量，年减碳 1.34 万吨、节省用电成本近 200 万元。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：存量电站加装智能逆变器/子阵控制器（SmartACU 类）→ 接入智能光伏管理系统 → 开启 IV 诊断月度订阅与无人机融合诊断。\n2. 硬件清单：组串式逆变器（如 SUN2000-196KTL 级，最大效率 99.03%）、智能子阵控制器、气象站、复训用无人机；软件：FusionSolar 类电站管理系统。\n3. 软件与接口：平台数据经 IEC104/Modbus 开放三方系统，可对接企业能碳管理中心与银行贷后监测。\n4. 实施步骤：电站健康体检（1 周）→ 诊断功能开通与基线对比（2 周）→ 故障闭环消缺（1 个月）→ 持续月度诊断报告。\n5. 预期效果：发电量提升 1%~3%（AI 跟踪+消缺），运维成本下降 50% 以上；100MW 电站 25 年生命周期内检测节省+发电提升合计约折合 1000 万元。\n6. 数据采集方式：组串级秒级数据上云，自动生成 PR（性能比）日报、离散率分析、故障清单。\n7. 可执行颗粒度：1 万㎡厂房屋顶约可建 1MW，年发电约 110 万 kWh，自用比例每提高 10 个百分点，年多省电费约 7~8 万元。\n8. 屋顶适配：彩钢瓦屋面做支挂一体化、混凝土屋面做配重，需荷载鉴定；租赁厂房需租期覆盖电站寿命并取得产权方书面同意。\n【业务定义】『自发自用』指发的电优先给厂里自己用（直接替代向电网买的电，省下电费）；『余电上网』指用不完的电卖给电网（获取售电收入）。一个屋顶光伏项目的总投资（组件、逆变器、支架、施工、并网）清晰可算，发电量可由屋顶面积与当地日照估算，因此现金流（省下的电费＋卖电收入）可测算、可核验，设备可抵押、电费收益权可质押。\n【信贷切入点】这是商业银行绿色项目贷款与固定资产贷款的优质基础资产。常见结构是『电费收益权质押＋设备抵押＋项目公司股权质押』的组合担保，贷款期限与投资回收期（通常 5~7 年）匹配。对初学者要记住：光伏项目本身现金流稳定、政策路径清晰，是入门绿色信贷的最好练手对象。\n【关键数据】0.10~0.15kW/㎡（屋顶单位面积装机（每平米可装 100~150 瓦，视倾角与朝向））；6~8%（项目 IRR（内部收益率，衡量项目自身造血能力的核心指标））；25年（组件寿命期（组件衰减慢于 20%，银行一般只按 10~15 年放款））；5~7年（静态回收期（不考虑资金时间价值的回本年数））\n【适用场景】屋顶产权清晰、结构荷载达标（能承受光伏板重量的厂房）；自发自用比例高于 50% 的制造业客户（自用越多，越不受售电电价波动影响）；彩钢瓦屋面、混凝土屋面均可，但需先做防水与承载鉴定"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】电站适用绿色项目贷款：以电费收益权质押+设备抵押，成数约 70%、期限 8~15 年；符合人行碳减排支持工具范围的，可按贷款本金 60% 获得利率 1.75% 低成本资金；亦可由租赁公司购电站、企业付租的融资租赁结构。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】绿电部分可申报厦门绿电绿证交易奖励（按结算电量 0.01 元/度、每年≤50 万元）；电站投资可统筹申报节能降碳专项与设备更新政策；自建光伏不计入补贴收入，但可提升绿色工厂评分。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】屋顶租赁期短于电站寿命（厂房是租的，房东只租 10 年，电站却要用 25 年）；彩钢瓦翻新导致停发；产线搬迁或减产降低自用消纳；组件效率衰减快于预期、运维缺位导致发电量缩水。\n【新增风险与应对】执行风险：屋面漏水/荷载不足、组件衰减与积灰（应对：荷载鉴定、运维清洗合同、AI 诊断月度跟踪）；政策风险：全额上网转自发自用模式变化、补贴退坡（应对：以提高自用比例锁定收益、不依赖补贴测算）；市场风险：电价下行压缩自发自用价差（应对：锁定长期 PPA 或自用替代比例）；数据合规：发电与用电数据上云需过等保与数据出境评估。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "上游电源侧：屋顶光伏为工厂提供低价绿电，直接摊薄制造成本；所发绿电接入中游 EMS 做自发自用最大化调度，余电参与绿证交易（下游）；AI 诊断数据回哺碳管理系统的范围二核算；电站本身是固定资产贷款/项目贷款的标准标的。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某汽配厂 2MW（兆瓦，2000 千瓦）屋顶光伏：总投资约 800 万元，获绿色项目贷款 560 万元（七成成数）、期限 8 年、利率 3.6%，以电费收益权质押。年『省电费＋售电』合计约 120 万元，静态回收期约 6 年，贷款期内现金流足以覆盖本息。\n【自测题】为什么『自发自用比例越高』，光伏项目对银行的偿债保障就越强？\n【参考要点】自用电替代的是稳定的工商业电价，抗政策与市场波动能力强；而余电上网电价受政策调整影响大，稳定性更差。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：从市制造业名录里筛出用电量大的汽配、装备类企业，用准入标准核查：屋顶产权是否清晰、结构荷载是否达标、自发自用比例能否过半。三家入围，一家因厂房系租赁且租期仅剩6年，不足以覆盖贷款期，剔除，锁定汽配厂。\n2. 电话初步建联沟通：致电汽配厂王厂长，介绍我行屋顶光伏绿色项目贷，强调利率优惠、期限可到8~15年。王厂长说正有光伏意向、卡在资金，我核实了屋顶面积与年用电量，初步测算2MW可行，约好上门看屋面。\n3. 现场初次拜访调研：上屋顶查彩钢瓦年限与承载，看配电房与用电负荷曲线。王厂长关心能省多少、会不会漏雨。我留下产品手册和资料清单，约定提供屋顶产权/租赁证明、近一年电费单和厂房结构图。\n4. 全面尽职调查核验：核验产权与租期、荷载鉴定报告、并网批复，用当地辐照数据测算发电量，交叉验证自用比例与综合电价；现场抽查电表。确认总投资约800万、年省电费加售电约120万，回收期约6年，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『绿色项目贷款』：额度560万、七成，期限8年，利率3.6%，以电费收益权质押加设备抵押组合担保。王厂长希望月供平滑，我按发电现金流设计还款计划，敲定核心条款。\n6. 授信报告撰写与申报：撰写授信报告，附可研、荷载鉴定、并网批复、电费单、收益测算与担保方案，强调项目现金流稳定、政策路径清晰，按流程提交支行上报。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗认定项目属清洁能源目录、核算碳减排量。审查提示关注屋面翻新停发与组件衰减风险，要求运维和保险安排落实到位。\n8. 授信审批与出具批复：审贷会关注租期与消纳稳定性。确认租期覆盖贷款期并设屋面维护条款后获批：额度560万、期限8年、收益权质押，出具正式批复。\n9. 合同签署与担保落实：签订借款、电费收益权质押、设备抵押合同，办妥登记；屋面维护与产权方配合条款写入合同附件。王厂长确认电费结算账户开在我行，便于归集。\n10. 放款条件核验与贷款发放：核验组件到货、施工方资质、并网验收预约与质押登记后，按工程进度受托支付设备款与工程款，首笔发放，资金直达项目。\n11. 贷后全流程管理：接入能耗监测直连，按月看发电与自用电量；每季度现场查屋面与逆变器。一次发电量连续偏低，排查为组件积灰，督促清洗后恢复，贷后报告如实记录。\n12. 到期结清与业务循环：贷款按期结清。王厂长二期扩建厂房再上1MW光伏，我行快速重启授信，并联动其结算与代发，形成长期合作。"
+   }
+  ]
+ },
+ "风电光伏(地面)": {
+  "category": "上游",
+  "aiLink": "AI 预测风光出力、提前安排生产与交易，把『看天吃饭』变成『算着天吃饭』。",
+  "attachments": [
+   {
+    "name": "风光功率预测系统产品资料.pdf",
+    "url": "./assets/windpv-forecast.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "绿电PPA协议要点清单.pdf",
+    "url": "./assets/windpv-ppa-checklist.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "地面光伏与分散式风电、风光互补项目，作为大电量的集中式绿电来源，补足屋顶光伏装机不足，为园区或工厂提供规模化绿电。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『资源预测+消纳最大化+智能诊断』：①风光功率预测——数值天气预报+AI 修正，为电力交易与企业生产排程提供 96 点出力曲线；②跟踪支架 AI 追光——实时调整角度捕获边角光照，双面组件增益 0.5%~1%；③智能 IV 诊断与无人机融合——组件级故障分钟级定位；④弃光弃风预警——结合限电历史与电网检修计划，提前调整储能充放与负荷。对零碳工厂而言，地面风光电通常以专线/PPA 形式供电，AI 的价值在于把『波动的绿电』与『刚性的产线』匹配起来。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：电站侧部署功率预测系统+智能子阵控制器；用电侧把预测曲线接入 EMS/生产排程（MES），实现错峰生产。\n2. 硬件清单：气象站、辐照仪、智能逆变器、储能 PCS（如配储）、PLC 数采网关；软件：功率预测平台、电力交易辅助决策系统。\n3. 软件与接口：预测数据经 API 对接交易平台（申报曲线）与企业 MES（排产约束），支持 Modbus/IEC104。\n4. 实施步骤：历史数据清洗（≥1 年）→ 模型训练与回测（准确率≥85%）→ 与交易申报流程联调 → 按月滚动评估。\n5. 预期效果：功率预测准确率每提高 5 个百分点，考核偏差费用下降约 30%~50%；AI 跟踪+消缺合计提升发电量 1%~3%。\n6. 数据采集方式：场站级秒级上云，气象数据与电网调度数据双源校核。\n7. 可执行颗粒度：50MW 风光电站配 5MW/10MWh 储能，利用 AI 充放策略可将弃电率从 8% 压到 3% 以内，年多上网约 200 万 kWh。\n8. 交易衔接：以 PPA 锁定量价，参与绿电/绿证交易获取环境价值溢价。\n【业务定义】风电光伏（风光互补）项目单体投资大、回收期长，强依赖银行贷款，通常采用项目融资（Project Finance）或银团贷款（多家银行联合放款）。其现金流核心是与用电方签订的长期购电协议（PPA），电费收益权可质押；对初学者要理解『项目融资』是以项目自身现金流还款、对股东有限追索的融资方式。\n【信贷切入点】这是典型的项目融资标的：还款主要来自项目自身发电收入，而非股东担保。银行要严审资源评估（风资源/光照资源）、并网批复与 PPA 购电方信用。因金额大、期限长，常由一家主办行牵头、多家银行组成银团分担。\n【关键数据】0.25~0.35元/kWh（LCOE（平准化度电成本，衡量发电全生命周期单位成本））；20年（风电项目经营期（风机设计寿命通常 20 年以上））；70~80%（贷款成数（贷款占总投资比例））；10~15年（贷款期限（短于项目经营期，留足安全垫））\n【适用场景】园区集中供能、需要大电量绿电的场景；厂址邻近风资源区（风功率密度高的区域）；有明确长期绿电消纳方（签了 PPA 的用能大户）"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】项目适绿色项目贷款/银团：以电费收益权+项目股权质押，期限 15 年左右、成数约 75%；符合碳减排支持工具范围的按本金 60%、利率 1.75% 获得低成本资金；大额项目可组合绿债/绿色银团。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】可申报国家绿色工厂/园区配套奖励（福州对国家级绿色供应链示范企业再奖 30 万元）；参与绿电交易部分可叠加厦门 0.01 元/度奖励；设备投资适用设备更新与专用设备数智化改造政策。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】来风或光照不及预期（资源评估过于乐观，实际发电量打折）；限电导致弃风弃光（电网消纳不了，发的电卖不掉）；电价补贴退坡侵蚀收益；设备大型化带来的运输与吊装风险。\n【新增风险与应对】执行风险：资源不及预期、并网滞后（应对：一年以上实测数据、并网批复作为放款前提）；政策风险：限电弃电、保障性收购政策变化（应对：PPA 约定兜底收购小时数、储能配比提高自发自用率）；市场风险：现货价格波动（应对：中长期合约+现货套保组合）；数据合规：功率预测数据接入调度系统需通过电力监控系统安全防护规定。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "上游电源侧：地面风光提供规模化绿电，经储能配套平滑后送入工厂；AI 预测结果是 EMS 调度与 VPP 聚合的输入；下游接制造企业客户（购电协议方）与绿证交易节点；金融端以电费收益权质押做项目贷款/银团。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某产业园 50MW（兆瓦）风光互补项目：总投资 3.2 亿元，三家银行组成银团提供绿色项目贷款 2.4 亿元（七成五）、期限 15 年，PPA 绑定园区管委会下属用能平台，锁定消纳与回款。\n【自测题】项目融资中的『有限追索』意味着银行主要依赖什么来收回贷款？\n【参考要点】主要依赖项目自身产生的现金流（发电收入），股东仅在约定范围内（如完工担保、资本金）承担有限责任。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：梳理园区及有绿电诉求的大客户，核查风光资源、并网条件与消纳方。某产业园有50MW风光互补规划且已锁定用能平台，准入初判可行，列为重点；另一项目因弃风弃光率高、消纳无着落，剔除。\n2. 电话初步建联沟通：与园区管委会及用能平台负责人通话，介绍银团绿色项目贷款，核实总投资约3.2亿、贷款需求约2.4亿、期限15年的意向，确认已签PPA意向，约见面谈。\n3. 现场初次拜访调研：赴园区看选址风向与光照条件、升压站与并网点，了解用能平台年用电量。管委会关注审批与消纳保障，我留下产品与银团方案介绍，约定收集可研与资源评估。\n4. 全面尽职调查核验：审可研报告、一年以上风资源与辐照实测数据、并网批复、消纳保障文件与PPA条款；核查用能平台信用与付款能力、股东资本金到位计划。确认LCOE与收益测算合理，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『银团绿色项目贷款』：总额2.4亿、成数约75%，期限15年，以电费收益权质押加项目股权质押。与另两家银行敲定份额、利率与代理行安排，再与企业确认核心条款。\n6. 授信报告撰写与申报：作为牵头行撰写银团授信报告与信息备忘录，附可研、资源评估、并网与消纳文件、PPA、现金流模型，提交三家银行同步审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗认定属可再生能源目录、核算年减排量。审查提示关注限电弃电与资源不及预期，要求做发电量敏感性并设担保补足机制。\n8. 授信审批与出具批复：三家银行审贷会分别审议，围绕资源可靠性、限电历史与PPA方信用质询。补充数据与保护条款后全部获批，出具银团授信批复并签订银团协议。\n9. 合同签署与担保落实：签订银团贷款合同、电费收益权质押与股权质押合同，办妥登记；确认并网、用地、环评手续齐备，用能平台PPA正式签署并作为放款前提。\n10. 放款条件核验与贷款发放：核验资本金到位、开工许可、设备招标与质押登记后，按建设节点受托支付，贷款分笔发放至项目账户，专款专用。\n11. 贷后全流程管理：按季跟踪建设进度与并网计划，投产后监测发电量、上网结算与限电情况；每年做发电量与电价压力测试，动态评估偿债覆盖率并出具贷后报告。\n12. 到期结清与业务循环：项目进入稳定运营、贷款按计划偿还。园区二期扩容再启合作，我行以更低成本续做银团，并把碳资产托管、绿证结算一并纳入，深化长期合作。"
+   }
+  ]
+ },
+ "分散式风电/风电PPA": {
+  "category": "上游",
+  "aiLink": "AI 把 PPA 电价曲线与企业负荷曲线对齐，让每一度绿电都买到最低价。",
+  "attachments": [
+   {
+    "name": "PPA电价匹配分析报告模板.pdf",
+    "url": "./assets/windppa-match-report.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "福建省需求响应申报操作指引.pdf",
+    "url": "./assets/windppa-dr-guide.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "PPA（Power Purchase Agreement，购电协议）是工厂与风电/光伏电站签订的长期购电合同，锁定绿电量与优惠电价，平抑电价波动、满足绿电考核或出口碳足迹要求。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『电价预测+负荷匹配+交易套利』：①中长期+现货电价预测，指导 PPA 签约比例与分时段结构；②AI 将企业柔性负荷（可中断产线、空调、充电桩、储能）与 PPA 曲线的错配部分自动重排——绿电多发时多生产、绿电低谷时储能顶上；③虚拟电厂平台把富余调节能力参与需求响应与现货市场，赚取响应补贴与价差。分散式风电就近接入工厂，AI 调度使其从『卖电给电网』变成『替工厂省电费』。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：签订 PPA 前先做 12 个月负荷曲线与出力曲线匹配分析；落地 AI 调度平台对接企业 EMS 与交易平台。\n2. 硬件清单：关口计量柜、储能变流器、柔性负荷控制器（空调/充电桩/产线）、边缘网关；软件：AI 调度与电力交易辅助系统。\n3. 软件与接口：调度指令经 Modbus/IEC104 下发终端；交易侧对接电力交易平台 API，支持申报-出清-结算数据回传。\n4. 实施步骤：负荷资源摸排（可调容量评估）→ 平台联调 → 首次需求响应试跑 → 常态化参与竞价与现货。\n5. 预期效果：绿电占比每提升 10 个百分点，范围二排放下降约 8%~12%；需求响应参与后年增收可达数十万至数百万元（视可调容量）。\n6. 数据采集方式：15 分钟级计量结算数据，日级生成匹配度报告。\n7. 可执行颗粒度：福建需求响应按年度竞价边际出清，5 月底签协议、6 月 15 日前竞价，补贴经电费退补到账；厦门补偿基准价 4 元/kWh，再乘价格系数（0~1）与速度系数（1~3）。\n8. 风险对冲：PPA 设置价格调整与偏差电量条款，允许一定比例偏差免考核。\n【业务定义】工厂绿电不足时，通过 PPA 从外部绿电基地买电。对用电侧，PPA 是『成本节约＋绿电权益』凭证，能增强其还款能力；对发电侧，一份有信誉购电方的 PPA 是项目融资的基石。初学者务必注意：PPA 中『绿证归谁』必须写清楚，否则日后卖绿证的钱归属不清，会引发纠纷。\n【信贷切入点】银行有两类介入：①对发电侧，以 PPA 电费收益权质押做项目融资；②对用电侧，把 PPA 带来的稳定成本节约与绿电权益作为增信依据，给予更优惠的流动性贷款。重点是审协议条款（电量、电价、违约、绿证归属）与购电方信用。\n【关键数据】0.30~0.45元/kWh（协议电价（低于当地工商业电价才有签的价值））；10~20年（协议期限（长期锁价是 PPA 的核心价值））；70~90%（约定消纳比例（购电方承诺消纳的电量占比））\n【适用场景】用电量大、需满足绿电考核或出口碳足迹/CBAM 要求的制造客户；厂址附近有可签约的绿电基地；希望锁定长期电价、对冲电价上涨的企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】PPA 模式下银行可做：①项目贷款（电费收益权质押）；②国内保理（PPA 应收款转让）；③需求响应收益权质押（福建/厦门需求响应补贴作为稳定还款来源）；④储能设备融资租赁。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】绿电交易可叠加厦门绿电绿证 0.01 元/度奖励（每年≤50 万元）；需求响应补贴按福建省年度竞价价格执行；风电项目属清洁能源领域，符合碳减排支持工具支持范围。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】实际供电低于协议量，用电方需补差价或外购高价电；绿证归属约定不清导致权属纠纷；偏差考核罚款（实际用电与约定曲线偏离被罚）；购电方信用风险。\n【新增风险与应对】执行风险：负荷与出力错配导致偏差考核（应对：AI 匹配+偏差条款）；政策风险：分时电价与需求响应规则调整（应对：按最新文件测算并做±20%敏感性）；市场风险：电价波动（应对：中长期+现货组合、套保）；数据合规：交易与负荷数据涉及商业秘密，平台应通过等保三级。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "上游电源侧：分散式风电以 PPA 形式向工厂直供绿电；AI 调度平台是连接风电出力、工厂负荷与电力市场的中枢；下游接制造企业客户（用电方）与 EMS/储能节点；金融端可用 PPA 应收款做保理或收益权质押。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某电子厂签 15 年风电 PPA，约定电价 0.38 元/kWh、消纳比例 85%，年省电费约 300 万元。银行据此认定其能源成本下降、现金流更稳，给予流动资金贷款利率下浮，并同步绑定结算存款。\n【自测题】PPA 中『绿证归属』约定不清，会对哪类融资造成权属风险？\n【参考要点】会影响以绿证收入为还款来源的融资（如绿证收益权质押），也可能影响碳质押中环境权益的完整性。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选用电量大、有绿电考核或出口碳足迹需求的电子、装备企业。某电子厂年用电超5000万度且有出口业务，符合准入；核查其周边是否有可签的绿电基地，初判可行。\n2. 电话初步建联沟通：致电电子厂陈经理，说明PPA可锁定15年绿电、平抑电价并满足出口绿色要求，核实其绿电占比诉求与预算，确认有签约意向，约见绿电基地与企业双方面谈。\n3. 现场初次拜访调研：赴电子厂看生产负荷与用电曲线，了解其对电价波动和碳足迹的担忧；又联系邻近风电基地考察资源与并网。双方均有诚意，我留下方案，约定核实电量电价细节。\n4. 全面尽职调查核验：核验双方履约能力、电网结算路径、历史电价与偏差考核规则；重点审PPA草案的电量、电价、调价、违约与绿证归属条款。确认0.38元/kWh、消纳85%可行，形成尽调意见。\n5. 定制化授信方案洽谈：为用电侧匹配『流动性贷款』并据PPA节约予以利率下浮，同时绑定结算账户；为发电侧备好收益权质押的项目融资备用方案。敲定用电侧额度、期限与结算归集安排。\n6. 授信报告撰写与申报：撰写授信报告，附PPA草案、用电数据、结算路径与收益节约测算，说明PPA增强现金流稳定性、支撑还款，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验绿证与碳资产归属、避免环境权益重复获益。审查提示偏差考核与供电不足补差价风险，要求明确补差与违约处理机制。\n8. 授信审批与出具批复：审贷会关注长期电价与偏差风险。确认PPA关键条款与结算保障后，批复用能侧额度并予利率优惠，出具批复，同时约定PPA正式签署为提款前提。\n9. 合同签署与担保落实：落实用电侧借款合同与结算账户绑定；协助促成电子厂与风电基地正式签署15年PPA，绿证归属条款明确写入，为后续绿证收益与融资确权。\n10. 放款条件核验与贷款发放：核验PPA生效、结算账户开立与首次抄表数据后，发放流动资金贷款并锁定资金归集路径，确保回款可控。\n11. 贷后全流程管理：按月核对实际用电与PPA约定曲线，监控偏差考核与结算；每季评估电价节约兑现情况，跟踪绿证核发与归属，动态评估对还款的影响。\n12. 到期结清与业务循环：贷款正常周转使用。基于稳定合作，我行追加绿证收益权质押额度，并把结算、代发、碳资产服务一并延伸，形成长期综合合作。"
+   }
+  ]
+ },
+ "储能配套": {
+  "category": "上游",
+  "aiLink": "储能是最典型的 AI 套利资产：同样的电池，策略好坏收益差 15%~20%。",
+  "attachments": [
+   {
+    "name": "工商业储能EMS策略白皮书.pdf",
+    "url": "./assets/storage-ems-whitepaper.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "储能消防审查与并网资料清单.pdf",
+    "url": "./assets/storage-fire-grid-checklist.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "储能系统（以电化学电池为主）用于峰谷套利、需量管理（削峰降容）、光储协同与应急备电，是提升绿电消纳与用电经济性的关键灵活性资产，堪称工厂的『充电宝』。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『充放策略优化+电芯级诊断+多市场套利』：①峰谷套利——AI 按分时电价与负荷预测自动生成两充两放计划，华为 AI-EMS4.0 在丹麦 132MWh 项目使峰谷套利收益提升 15%~20%；②需量管理——EMS 实时采集变压器侧负荷，与储能出力做闭环差值控制，压低最大需量、节省基本电费；③电芯 AI 诊断——阳光电源 EMS3000 通过电芯级诊断源头阻断热失控、SOC 均衡提升系统效率；④VPP 聚合——储能响应速度最快、履约最精准，是虚拟电厂的核心资源。硬件侧，华为 LUNA2000（200kWh 系统：215.04kWh/100kW，往返效率≥92%，支持 Modbus TCP/IEC104）与阳光 SH 系列是工商业主流；固德威 SEMS 2026 年 1 月发布 AI 智能体，支持 48 台并机集群调度。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：配电房增配储能柜（100kW/215kWh 级）+EMS 控制器；策略层接入分时电价表、需量数据与 VPP 平台，三模式自动切换。\n2. 硬件清单：电池柜、PCS、BMS、EMS、关口电表、消防主机；软件：EMS 云平台+VPP 聚合 App。\n3. 软件与接口：EMS 支持 Modbus TCP/RTU、CAN、IEC104、MQTT；第三方 PCS/BMS 可通过领祺 PEMS300 等网关适配（400+设备协议库），避免被单一厂商绑定。\n4. 实施步骤：负荷与电价数据分析（2 周）→ 容量选型（按最大需量与峰谷价差双约束）→ 安装联调（4~8 周）→ 策略试运行（1 个月）→ 接入 VPP。\n5. 预期效果：峰谷套利+需量管理合计降低用电成本 15%~30%；系统往返效率≥92%，策略优化使套利收益再提升 15%~20%。\n6. 数据采集方式：秒级充放电与负荷数据，日级收益核算；SOC 偏差超限自动告警。\n7. 可执行颗粒度：215kWh 储能柜按福建典型峰谷价差年套利收益约 3~5 万元；叠加需量管理（压低 100kW 最大需量）年再省基本电费约 2~4 万元。\n8. 安全合规：储能进楼须过消防审查（电芯级热失控监测+全氟己酮/细水雾），选址满足防火间距。\n【业务定义】储能的盈利逻辑是『低买高卖』：在电价低的谷时/平段充电，在电价高的峰时放电（峰谷套利）；同时通过放电削减工厂的最高用电功率（需量管理），降低按容量收取的基本电费。储能设备投资明确、残值可估、可抵押，因而可作固定资产贷款或融资租赁标的。\n【信贷切入点】银行可结合当地峰谷价差与充放次数做现金流测算，以『设备抵押＋收益权质押』组合授信。安全与消防合规是放款前置条件（电池有热失控风险）。储能收益受电价政策影响大，务必做价差敏感性分析。\n【关键数据】2h/4h（典型时长配置（储能容量÷功率，2 小时放 2 小时电））；0.6~1.0元/kWh（峰谷价差（低谷与高峰电价之差，越大套利空间越大））；6000~8000次（电池循环寿命（充放电一次为一次循环））；10~15%（对项目 IRR 的贡献（储能让光储项目更划算））\n【适用场景】峰谷价差大的省份（价差决定套利空间）；需削峰降容的基本电费大户（变压器容量电费占比高）；光储一体化项目（配储可提高绿电消纳与收益）"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】储能是融资租赁最标准场景：租赁公司购储能柜、企业付租（期满留购），不占授信额度；亦可做储能项目贷款+峰谷套利收益权质押；参与 VPP 的可用需求响应收益权质押；利率可挂钩降碳 KPI 享绿色激励。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】储能设备属节能节水专用设备目录范围，数智化改造投入可享 2024~2027 年 10% 抵免；需求响应补贴按福建年度竞价价格/厦门 4 元每 kWh 基准执行；配储项目有助申报零碳工厂认定。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】电池衰减快于预期（实际循环寿命或容量保持率不及承诺）；峰谷价差政策调整（价差收窄直接压缩套利）；安全消防合规不到位（热失控风险）；设备供应商资质与售后能力弱。\n【新增风险与应对】执行风险：电池衰减与热失控（应对：电芯级监测、消防审查、质保与容量衰减条款）；政策风险：峰谷价差收窄、时段调整（应对：按最新电价文件测算+±20%敏感性、设补足机制）；市场风险：现货价格波动（应对：中长期+现货组合）；数据合规：充放电数据上云须过等保，用户用电数据脱敏。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游枢纽：储能上游承接光伏/风电的波动绿电（充电消纳），下游向 EMS/VPP 输出可调容量，参与需求响应与现货交易；金融端是融资租赁与收益权质押的标准化标的，也是虚拟电厂节点中响应最快的资源。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某园区 20MWh（兆瓦时）储能电站：总投资约 2800 万元，获固定资产贷款 1960 万元（七成）、期限 8 年。收益来自峰谷套利＋需量管理，年合计约 420 万元；银行按电价政策变动情景做了敏感性测算，约定价差异常时启动担保补足。\n【自测题】如果某地取消峰谷分时电价，储能项目的哪一部分现金流会直接受损？\n【参考要点】峰谷套利收益会消失或大幅缩水；需量管理收益（降基本电费）相对独立，受影响较小。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选取峰谷价差大省份、容量电费占比高的园区与工厂。某园区有光储一体化规划、峰谷价差约0.8元/kWh，准入初判可行；核查消防与并网条件，锁定为重点。\n2. 电话初步建联沟通：致电园区能源负责人，说明储能可峰谷套利叠加需量管理降本、我行有固定资产贷款支持，核实其20MWh配置意向与总投资约2800万的资金缺口，约现场交流。\n3. 现场初次拜访调研：看配电房容量、负荷曲线与变压器需量情况，了解场地与消防条件。园区关心回本周期与安全，我留下储能方案与产品介绍，约定收集电价政策与负荷数据。\n4. 全面尽职调查核验：核验近两年负荷曲线、峰谷价差政策文件、并网与调度协议、消防设计；对电池循环寿命、衰减与残值做审慎评估，测算套利加需量年收益约420万，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『固定资产贷款』：额度1960万、七成，期限8年，以设备抵押加收益权质押。园区希望利率优惠，我按绿色信贷口径争取，并约定价差异常触发担保补足，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附电价政策、负荷数据、收益与敏感性测算、消防与并网文件、担保方案，说明收益可测、政策风险已设保护，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗认定储能属灵活性调节类绿色项目、核算促消纳减排效益。审查提示电池衰减、价差收窄与消防安全，要求保险与运维落实。\n8. 授信审批与出具批复：审贷会关注价差敏感性与安全合规。确认消防验收标准、保险与补仓机制后获批：额度1960万、期限8年、组合担保，出具批复。\n9. 合同签署与担保落实：签订借款、设备抵押与收益权质押合同，办妥登记；消防设计审查与并网协议作为放款前提，运维与保险责任写入合同附件。\n10. 放款条件核验与贷款发放：核验电池到货、安装与消防验收、并网调试、质押登记后，按设备与工程进度受托支付，贷款分笔发放。\n11. 贷后全流程管理：接入运行数据监测充放次数、可用率与收益到账；每季查电池健康与消防。一次价差收窄致收益下滑，启动敏感性复核并提示补足，贷后报告如实反映。\n12. 到期结清与业务循环：贷款按期结清、收益兑现。园区二期加配储能并参与需求响应，我行重启授信，延伸至VPP聚合与结算服务，深化合作。"
+   }
+  ]
+ },
+ "储能与负荷管理": {
+  "category": "中游",
+  "aiLink": "AI 负荷管理把工厂的用电曲线『削峰填谷』，每一度柔性负荷都是钱。",
+  "attachments": [
+   {
+    "name": "福建省电力需求响应实施方案.pdf",
+    "url": "./assets/load-dr-fujian.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "可调资源分级建模操作手册.pdf",
+    "url": "./assets/load-resource-manual.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "负荷管理是通过对工厂用电负荷的聚合、调度与控制，削减最大需量、参与需求响应，从而降低基本电费并获取电网补偿的运营手段。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『负荷预测+柔性调度+需量闭环』：①短期负荷预测（96 点曲线）指导生产排程与储能计划；②可中断负荷分级——非生产性负荷（空调、照明、充电桩）秒级响应，辅助生产负荷分钟级，主产线负荷与厂方逐项协议确定；③需量闭环——实时采集变压器侧负荷、与储能出力做差值控制，采样频率≥1 秒，端到端时延数百毫秒内，避免触发 KPI 罚款；④虚拟电厂聚合——把工厂空调、充电桩、产线柔性负荷打包参与需求响应和现货市场。福建模式：每年 5 月底前与电网企业签订需求响应协议，6 月 15 日前参与集中竞价（边际出清），补贴经电费退补；厦门补偿基准价 4 元/kWh×价格系数（0~1）×速度系数（1~3），200kW 以上可直接参与、200kW 以下由聚合商代理。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：加装负荷管理装置接入新型电力负荷管理系统→可调资源分级建模→AI 调度平台对接省 VPP/聚合商→常态化响应。\n2. 硬件清单：智能电表/负荷管理终端、空调智能控制器、充电桩有序充电模块、储能 PCS、边缘网关；软件：负荷聚合与调度平台。\n3. 软件与接口：与新型电力负荷管理系统对接，支持指令传输、响应量确认、负荷调节；具备 IEC104/Modbus 上行能力。\n4. 实施步骤：可调资源摸排（1 个月）→ 能力核验与注册 → 首次邀约试跑 → 竞价常态化；响应时段不低于 1 小时。\n5. 预期效果：单次响应收益=实际响应负荷×响应时间×补贴价格；厦门单次响应按 4 元/kWh 基准测算，500kW 响应 2 小时理论补偿约 4000 元（按系数折算）；年参与 20 次以上收益可观。\n6. 数据采集方式：15 分钟级计量+秒级控制回路，基线由电力负荷管理中心按约定算法计算。\n7. 可执行颗粒度：先做空调与充电桩改造（投资 5~15 万元）即可形成首批可调容量，产线柔性负荷按停机损失分级排序后接入。\n8. 无效响应红线：响应时段最大负荷与平均负荷须低于基线且差值≥申报量 50%，否则无效，需做响应前预演。\n【业务定义】工厂电费里有一块『基本电费』是按变压器容量或最大需量收取的（即使不用也要付）。负荷管理通过错峰用电、储能放电、可中断负荷投切来压低最高功率，直接省下基本电费；同时参与电网『需求响应』（电网紧张时让负荷少用电，换取补贴）。初学者要区分：需量管理省自己的钱，需求响应赚电网的补贴。\n【信贷切入点】可量化的需量管理收益与需求响应补偿构成项目现金流的一部分，能提升偿债能力。它也是虚拟电厂（VPP）聚合融资的入口——把分散的小负荷聚合成一个大『虚拟电厂』参与电力市场，为银行提供新的授信场景。\n【关键数据】基本电费（削减对象（按容量/需量收取的固定电费部分））；需求响应（补偿来源（电网向让电企业支付的补贴））；可中断（负荷要求（能在约定时段短时降功率的生产环节））\n【适用场景】容量电费占比高的大型工业客户；拥有可中断负荷（如空调、水泵、炉窑）的工厂；接入虚拟电厂、参与电力市场交易的用能主体"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】需求响应收益权可质押：福建补贴经电费退补、现金流可测，银行可按近 12 个月平均响应收益核定质押率（一般 50%~70%）；亦可组合流动资金贷款+利率挂钩降碳 KPI 的绿色激励贷。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】需求响应补贴按福建省年度竞价边际出清价格、厦门 4 元/kWh 基准×系数执行；负荷管理改造投入可叠加专用设备数智化改造 10% 抵免；接入 VPP 有助零碳工厂/绿色工厂评分。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】响应不及时受考核罚款（电网要求降功率却没做到）；补贴政策变动；聚合平台（VPP 运营商）信用与结算风险；可中断负荷影响生产工艺连续性。\n【新增风险与应对】执行风险：响应不合格被考核、影响生产节拍（应对：响应前预演、分级接入、保安负荷严禁接入）；政策风险：竞价价格波动、规则调整（应对：多年度跟踪、按保守价测算）；市场风险：邀约频次不确定（应对：不作为第一还款来源）；数据合规：负荷数据涉生产秘密，接入系统须通过电力监控安全防护。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游核心：负荷管理上游连接分布式电源与储能（何时充放），下游连接 EMS 与虚拟电厂（聚合参与市场）；AI 预测是排程依据，需求响应收益是新的现金流；金融端可用响应收益权质押，是零碳工厂运营期最稳定的『第二收入』。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某化工企业参与需求响应并做需量管理，年『补偿＋需量节约』约 180 万元。银行将其中约 70% 作为补充还款来源计入测算，并约定结算账户回行，便于贷后监控。\n【自测题】需求响应『补偿收益』在授信中应被视作优先还是次级还款来源？为什么？\n【参考要点】宜作次级/补充还款来源，因其依赖政策与调度、稳定性弱于主营经营现金流，不宜作为第一还款来源。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选取容量电费占比高、有可中断负荷的化工、冶金企业。某化工企业变压器容量大、部分负荷可中断，符合准入；核查其参与需求响应的历史与政策窗口，锁定为重点。\n2. 电话初步建联沟通：致电化工企业设备部，说明需量管理可降基本电费、参与需求响应可获补偿，我行可提供配套融资，核实其年电费规模与改造意愿，约现场看负荷。\n3. 现场初次拜访调研：看主要负荷构成、最大需量记录与可中断环节（空调、水泵、炉窑），了解生产工艺对降功率的容忍度。企业关心不影响生产又能拿补偿，我留下方案与资料清单。\n4. 全面尽职调查核验：调取近两年负荷曲线与电费单，核验最大需量、可压缩空间与需求响应历史；确认年补偿加需量节约约180万，评估结算路径与考核规则，形成尽调意见。\n5. 定制化授信方案洽谈：匹配『固定资产贷款』用于负荷控制改造，并把需求响应收益作为次级还款来源计入测算；约定补偿结算账户回行。企业关注不影响生产，我要求保留人工干预权限，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附负荷曲线、需量与补偿测算、改造方案、结算路径，说明还款来源以经营现金流为主、补偿收益为辅，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验需求响应政策与补偿结算的真实性。审查提示响应不及时受罚、补贴政策变动风险，要求审慎计入次级收益。\n8. 授信审批与出具批复：审贷会关注补偿收益稳定性与生产影响。确认以主营现金流为第一还款来源、补偿仅作补充后获批，出具批复并要求落实安全联锁。\n9. 合同签署与担保落实：签订借款与控制改造相关合同，落实担保；把响应考核、安全联锁与人工干预条款写入合同附件，确保不影响生产安全。\n10. 放款条件核验与贷款发放：核验改造方案评审、设备到货与系统联调、担保登记后，按进度受托支付发放贷款。\n11. 贷后全流程管理：按月监测负荷曲线与需量下降、补偿到账；每季评估响应及时率与考核情况。一次响应不及时被预警，协助优化控制策略，贷后报告持续跟踪。\n12. 到期结清与业务循环：贷款结清、降本兑现。企业拟接入VPP参与电力市场，我行以聚合融资与结算服务重启合作，延伸长期关系。"
+   }
+  ]
+ },
+ "EMS能源管理": {
+  "category": "中游",
+  "aiLink": "中央空调+空压站占工厂公辅能耗大头，AI 群控把系统能效重新拉回设计值。",
+  "attachments": [
+   {
+    "name": "高效机房AI群控解决方案简介.pdf",
+    "url": "./assets/ems-chiller-ai.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "制冷站能效基线测试记录表.xlsx",
+    "url": "./assets/ems-cop-baseline.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "EMS（Energy Management System，能源管理系统）是工厂的『能源大脑』，对电、热、冷、气等多能流统一调度优化，实现负荷预测、光储协同、需量控制与需求响应。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『系统级寻优+预测性维护+数字孪生』：①冷站群控——基于负荷预测动态调节主机加载率、水温设定与水泵频率，海尔高效机房智控（磁悬浮机组+物联群控）在济南轨道交通大厦（16.5 万㎡、3 台 1000RT+2 台 500RT 磁悬浮）实测系统能效比 5.61、年省电费约 135 万元，磁悬浮机组较传统空调节能 50%、寿命 30 年；②美的 iBUILDING 云平台以 AI 实时优化机组运行策略，公开资料称可降低系统能耗 40%；③天加并购加拿大 SMARDT 引入无油磁悬浮技术，热效率提升 35%~60%；④AI 故障预警与数字孪生——设备-系统-环境三级可视，维保从跑上跑下变成一键定位。暖通系统占建筑总能耗约 50%，工厂车间空调与制冷站同样是能耗大户。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：机房加装温度/压力/流量/电量传感器+边缘网关→AI 群控平台→接入楼宇/工厂自控系统；先软控后硬件，避免大拆大换。\n2. 硬件清单：磁悬浮/高效离心主机、变频水泵、变频冷却塔、物联群控箱、边缘服务器；软件：iBUILDING 类 AI 能控平台。\n3. 软件与接口：平台支持 BACnet/Modbus 对接现有 BA 系统；开放 API 给能碳管理中心与银行贷后监测。\n4. 实施步骤：能耗基线审计（2 周）→ 群控策略部署（4 周）→ 一个制冷季验证（能效比 COP 从 3.5 提到 5.5+）→ 持续寻优。\n5. 预期效果：机房系统整体节能 20%~50%；制冷站综合能效系数 COP 可达 6.05（公开案例），年能耗下降 35%。\n6. 数据采集方式：秒级工况数据上云，日级能效报告，月度生成节能账单。\n7. 可执行颗粒度：1000RT 冷站 AI 群控改造投资约 30~50 万元，按年运行 3000 小时、综合电价 0.75 元测算，年省电费约 60~100 万元。\n8. 运维提效：AI 主动服务缩短人工培训周期，一组运维人员即可管控主机+水泵+冷却塔（原需三组）。\n【业务定义】EMS 通过传感器采集全厂能耗数据，用算法做负荷预测与优化调度（如何在电价最低时多用、在光伏大发时多用），从而带来系统级节能。它既是降碳工具，也是工厂申请绿色工厂/零碳工厂认证的数字化底座。对初学者：EMS 的节能贡献必须可量化验证，不能只听厂商宣传。\n【信贷切入点】EMS 带来的可量化节能收益与需求响应补偿，可纳入项目收益测算、增强还款来源；软件与平台投入亦可纳入绿色项目总投资。同时 EMS 是贷后能耗监测的载体，利于银行持续风控。\n【关键数据】5~10%（系统级节能贡献（靠调度优化而非换设备实现的节能））；ISO 50001（能源管理体系国际标准（认证可加分））；≥99%（平台可用率要求（系统要稳定在线））\n【适用场景】多能流、多产线、用能复杂的园区型客户；申请绿色工厂/零碳工厂/ISO 50001 认证的企业；已有光伏储能、需要统一调度的用户"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】机房改造适用 EMC 效益分享或固定资产贷款；高效机组可做融资租赁（磁悬浮机组单价高、租赁结构普遍）；节能收益权质押+设备抵押组合担保；利率可挂钩能效 KPI（COP 提升值）享绿色激励。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】节能改造享福州 500 元/吨标煤补助（年节能量≥150 吨，年度最高 500 万元）；机组数智化改造投入可抵免 10% 应纳税额（2024~2027）；高效机房有助绿色工厂/零碳工厂认定（国家级绿色工厂福州再奖 20 万元）。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】调度策略失误导致设备损伤或停电；系统可用率不足使节能效果打折；数据孤岛（各系统不打通）导致优化失效；过度依赖算法、缺乏人工干预权限。\n【新增风险与应对】执行风险：群控策略与生产工艺冲突（应对：双轨试运行、权限分级）；设备风险：磁悬浮轴承故障（应对：厂家 10+5 质保、备件协议）；政策风险：能效标准提升（应对：按标杆值设计）；市场风险：电价下行减少节省金额（应对：以节能量（kWh）而非金额签约）；数据合规：平台涉及厂用负荷数据，须等保与保密协议。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游软实力：EMS 是工厂能源系统的『大脑』，上游消纳光伏/储能发出的绿电，下游把运行数据喂给碳管理系统做范围二核算；AI 群控节约的电费直接增厚利润，是 EMC 与固定资产贷款的还款来源之一。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某食品厂做 EMS＋光储改造，平台软硬件投入 260 万元纳入项目总投资。上线后系统级年节能约 9%、额外收益约 150 万元，并借此通过绿色工厂认证，获银行绿色贷款额度提升。\n【自测题】EMS 的『节能贡献』为何必须在授信中做可量化验证，而非直接采信厂商宣传？\n【参考要点】宣传值往往是理想工况下的上限；银行需以改造前后实测数据或第三方核证为准，否则会高估还款来源。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选用能复杂、多能流、拟申报绿色工厂的食品、电子园区。某食品厂多产线、能耗品类多且有认证诉求，符合准入；核查其计量基础与EMS可行性，锁定为重点。\n2. 电话初步建联沟通：致电食品厂能源科，说明EMS可统一调度电热气、带来系统级节能并支撑绿色工厂认证，我行贷款可覆盖软硬件投入，核实其改造意向，约现场诊断。\n3. 现场初次拜访调研：看主要用能单元、已有计量与控制系统覆盖情况，了解峰谷与生产排班。厂方担心节能说不清、影响产能，我留下方案与资料清单，约定采集历史能耗数据。\n4. 全面尽职调查核验：核验历史能耗、计量覆盖与系统集成条件；评估EMS带来的系统级节能约9%、额外收益约150万的可验证性，确认平台投入约260万可纳入总投资，形成尽调意见。\n5. 定制化授信方案洽谈：匹配『绿色项目贷款（含软件）』覆盖EMS平台与配套改造，期限与回收匹配；约定以改造前后实测对比验证节能。厂方要求稳定优先，我强调保留人工干预权限，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附能耗数据、节能测算与验证方案、系统集成方案、认证规划，说明收益可量化、可验证，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验节能贡献测算方法与认证关联。审查提示系统可用率与调度失误风险，要求设安全联锁与人工干预。\n8. 授信审批与出具批复：审贷会关注节能可验证性与系统风险。确认以实测核验节能、设人工干预与可用率要求后获批，出具批复。\n9. 合同签署与担保落实：签订借款合同与相关采购、集成合同，落实担保；把平台可用率、节能验证节点与人工干预条款写入合同附件。\n10. 放款条件核验与贷款发放：核验软硬件到货、平台上线调试、担保登记后，按实施进度受托支付发放贷款。\n11. 贷后全流程管理：监测平台在线率、节能数据与调度日志；每季比对改造前后能耗、核验节能兑现。一次策略异常触发告警，及时人工处置，贷后报告持续跟踪认证进展。\n12. 到期结清与业务循环：贷款结清、节能兑现并助其获绿色工厂认证。企业扩产再启EMS深化与光伏配套融资，我行以综合服务延续合作。"
+   }
+  ]
+ },
+ "能耗在线监测": {
+  "category": "中游",
+  "aiLink": "能耗在线监测是 AI 节能的数据地基——没有秒级计量，一切算法都是无米之炊。",
+  "attachments": [
+   {
+    "name": "能耗在线监测系统产品简介.pdf",
+    "url": "./assets/mon-platform.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "计量点位勘察清单模板.xlsx",
+    "url": "./assets/mon-point-list.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "能耗在线监测是在工厂主要用能单元部署智能电表/气表/水表与边缘网关，实现分类分项计量、异常告警的系统，是节能与碳核算的数据底座。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『全量采集+异常识别+一数一源』：①分层计量——企业-车间-产线-设备四级表计，水电气热全自动实时采集（15 分钟级），支撑财税 2024 年第 9 号公告对『数据采集、数据传输和存储、数据分析、智能控制』四类数智化改造的界定；②AI 异常识别——用能突增/突降、夜间待机异常、单位产品能耗偏离行业标杆自动告警，把隐性浪费显性化；③数据治理——一数一源、全程可追溯，满足监管核查、补助申报与碳核算的同源要求；④与 MES/ERP 打通，把能耗数据翻译成成本语言。监管侧，能耗在线接入省重点用能单位能耗在线监测系统是硬性要求；银行侧，在线数据是贷后监管与节能效益核证的依据。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：加装四级智能电表+物联网关→数据上传企业能碳平台→AI 异常模型训练（≥3 个月数据）→对接监管系统。\n2. 硬件清单：智能电表（0.5S 级）、水表/气表/热表流量计、物联网关、边缘服务器；软件：能耗在线监测平台。\n3. 软件与接口：支持 HJ 212 等环保协议、Modbus/MQTT；与 MES/ERP 做工单级能耗关联。\n4. 实施步骤：计量点位勘察（2 周）→ 安装布线（2~4 周）→ 平台部署与校准（2 周）→ 监管接入验收。\n5. 预期效果：隐性浪费识别 5%~15%；数据人工统计工作量下降 80%；为节能改造提供可核证基线。\n6. 数据采集方式：15 分钟级采集，异常秒级告警，日/月/年多维报表自动生成。\n7. 可执行颗粒度：中型工厂（年用电 2000 万 kWh）监测改造投资约 20~40 万元，覆盖 300~500 个计量点。\n8. 合规要点：计量器具强制检定、数据保存≥5 年、监管平台数据真实性与企业法人负责制。\n【业务定义】所谓『分类分项计量』，就是把电、气、水按车间、按产线、按设备分开计量（GB 17167 是能耗计量配备的国家标准）。数据每 15 分钟自动采集上传，异常自动告警。对绿色信贷而言，监测数据的真实性是银行尽调与贷后监测的核心——它是替代企业『手工报表』、降低信息不对称的关键。\n【信贷切入点】银行应把『数据直连、不可篡改』作为绿色贷款的前置条件与贷后监测手段，要求客户把能耗数据接入银行绿色金融平台，实现线上监测与预警。物联网数据越真实，授信决策越可靠、贷后越省心。\n【关键数据】15分钟（采集粒度（每 15 分钟采集一个点，兼顾实时与成本））；≥95%（关键产线计量覆盖率（该装的表都装上））；3年（数据留存期（原始数据至少存 3 年备查））\n【适用场景】需向银行提供可核查能耗数据的绿色贷款客户；纳入碳市场的控排企业（碳核算依赖准确能耗）；希望发现能源浪费、持续改进的工厂"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】监测平台本身可纳入 EMC 或技改贷款；其最大金融价值在于『可核证』——银行凭在线数据做收益权质押的贷后监管；监测数据也是申报福州节能补助（预估节能量预拨 50%）的必备材料。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】监测改造投入符合专用设备数智化改造 10% 抵免（数据采集类投入明确列示）；接入省能耗在线监测系统满足监管要求；数据支撑绿色工厂与零碳工厂创建。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】数据断传或手工填报破坏真实性；人为篡改数据（影响能耗双控与核查）；计量点覆盖不足导致以偏概全；系统安全与数据隐私风险。\n【新增风险与应对】执行风险：计量点位遗漏导致数据失真（应对：点位清单签字确认、定期校表）；数据合规：生产数据涉密（应对：分级权限、本地化部署、等保）；政策风险：监管口径变化（应对：与主管部门预沟通）；市场风险：平台厂商锁定（应对：开放接口、数据可导出）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游地基：监测数据上游连接所有用能设备（空压/空调/产线），下游喂给 EMS 优化策略、碳管理系统核算与银行的贷后监测；没有监测，EPC 节能量无法核证、补助无法申报、收益权无法质押。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某银行要求光伏贷款客户必须接入能耗监测直连。贷后发现某客户自用电量连续骤降，触发预警，客户经理提前介入，查明是产线停产而非项目异常，及时调整了还款安排，避免违约。\n【自测题】为什么『手工填报』的能耗数据对绿色信贷而言被视为高风险？\n【参考要点】手工数据可被选择性填报甚至篡改，真实性与可审计性差；银行难以据此判断还款来源的真实性。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛需求绿色贷款、需向银行提供可核查能耗数据的客户。某制造企业拟上光伏贷且计量基础薄弱，我要求先完善能耗在线监测，作为授信前置条件，据此锁定并制定改造+融资组合方案。\n2. 电话初步建联沟通：致电企业能源负责人，说明银行绿色信贷要求数据真实可核验，需先部署分类分项计量，我行物联网金融可配套支持，核实其计量现状与改造预算，约现场勘查。\n3. 现场初次拜访调研：看主要用能单元与现有表计、数据采集方式，发现多处靠手工抄表。我强调手工数据难获银行认可，留下监测建设方案与资料清单，约定确定计量点位。\n4. 全面尽职调查核验：核验需计量覆盖的点位、采集粒度（15分钟）与数据留存（≥3年）是否达标；测试直连接口、确认不可篡改。确认关键产线计量覆盖率≥95%可行，形成尽调意见并作为授信前提。\n5. 定制化授信方案洽谈：匹配『绿色信贷＋数据增信』：把监测建设纳入项目、以直连数据支撑授信；约定数据接入银行平台作为放款与贷后条件。企业担心成本，我用数据增信换取利率优惠，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附计量点位图、直连方案、数据留存与安全措施，说明以真实数据替代手工报表、降低信息不对称，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验数据采集真实性与不可篡改性。审查提示断传、篡改与覆盖不足风险，要求设异常预警与现场抽核机制。\n8. 授信审批与出具批复：审贷会关注数据可靠性。确认直连、留存与预警机制到位后获批，出具批复并明确数据接入为提款前提。\n9. 合同签署与担保落实：签订借款与监测建设相关合同，落实担保；把数据接入、留存、异常预警与现场抽核写入合同附件，明确数据责任主体。\n10. 放款条件核验与贷款发放：核验表计安装、平台上线、直连接口调通与担保登记后，受托支付发放贷款，数据同步接入银行监测平台。\n11. 贷后全流程管理：实时监测能耗数据与自用电量，设异常阈值预警；一次自用电量骤降触发预警，现场查明为产线停产而非项目异常，提前调整还款安排，贷后报告如实记录。\n12. 到期结清与业务循环：贷款结清、数据体系沉淀为企业管理资产。企业扩产再启融资，我行基于可信数据快速续作，并延伸至碳核算数据服务，形成长期合作。"
+   }
+  ]
+ },
+ "碳管理系统": {
+  "category": "中游",
+  "aiLink": "碳管理系统把节能成果翻译成碳资产和碳溢价，让减排从成本变成收入。",
+  "attachments": [
+   {
+    "name": "数字化能碳管理中心产品简介.pdf",
+    "url": "./assets/carbon-platform.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "产品碳足迹核算报告模板.pdf",
+    "url": "./assets/carbon-footprint-template.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "碳管理系统对工厂碳排放进行盘查、核算、MRV（监测—报告—核查）与资产化运营，是绿色金融的数据底座与增信要素。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『自动核算+碳足迹+资产运营』：①多层级自动核算——企业/车间/产线/设备范围一、二及部分范围三排放自动计算，内置排放因子库与 MRV 机制，替代人工 Excel 盘查；②AI 节能寻优——把节能量折算碳减排量，识别高耗能高排放单元并推荐改造路径；③产品碳足迹——支撑 CBAM 应对与出口订单；④碳资产运营——配额与 CCER 的盈亏分析与交易窗口提示。产品侧：阳光慧碳 iCarbon 以阳光电源合肥零碳总部园区为实践载体（源网荷储碳一体化，年节约能源费用超 290 万元、年减排 CO₂ 1400 吨），已落地中车、奇瑞、长城汽车等；施耐德 EcoStruxure、西门子 Sustainability IQ、树根互联、中创碳投、碳阻迹、国网新能源云等构成主流梯队。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 改造方案：部署能碳管理中心（对接计量/MES/ERP 多源数据）→核算模型配置→产品碳足迹模块→碳资产台账；厦门对数字化能碳管理中心按不超过核定总投资 30% 补助（≤60 万元）。\n2. 硬件清单：复用能耗监测表计，增配碳数据采集网关；软件：iCarbon 类平台+排放因子库。\n3. 软件与接口：支持 ISO 14064/14067 核算标准，可对接第三方核查机构数据接口与集团 ESG 报送。\n4. 实施步骤：碳家底盘查（1~2 个月）→平台上线（2 个月）→首年碳核查演练→资产运营。\n5. 预期效果：核算人工下降 90%；碳强度对标发现 5%~15% 优化空间；出口型企业获得 CBAM 合规能力。\n6. 数据采集方式：能耗数据自动流转，活动水平数据与财务系统对账，全程留痕可审计。\n7. 可执行颗粒度：集团型多工厂平台一次性投入约 50~150 万元；厦门另对产品碳足迹/碳中和认证按服务合同≤50% 补助（每年≤20 万元）。\n8. 政策衔接：碳数据是零碳工厂评价（中国节能协会团体标准）与绿色工厂申报的核心证据链。\n【业务定义】工厂一年的碳排放要按 GHG Protocol（温室气体核算体系国际标准）或行业方法学算清楚：烧了多少煤/气/油、用了多少电（乘排放因子）、覆盖哪些范围（范围一直接排放、范围二外购电热、范围三供应链）。算清楚才能履约、才能开发碳资产。对初学者：数据真实＋权属清晰＝可质押的碳资产。\n【信贷切入点】规范碳管理产出的可追溯数据，是碳质押融资的前提。银行可据此开展碳托管、碳质押与碳金融综合服务，把企业的『碳负债』转化为『碳资产』，既增强客户粘性，又拓展中间业务收入。\n【关键数据】GHG Protocol（核算标准（国际通行的温室气体核算体系））；50~100元/吨（CCER 价格（国家核证自愿减排量，示例区间））；年度（盘查周期（通常每年做一次碳盘查））\n【适用场景】纳入全国碳市场的控排企业（火电、水泥、钢铁、电解铝等）；有 CCER 开发潜力的工厂（可再生能源、林业碳汇等）；需要产品碳足迹以应对出口/CBAM 的制造商"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】碳数据支撑碳配额质押融资（配额余量可质押、不用卖掉）与碳效益挂钩贷款（利率与年度减排量挂钩）；零碳工厂/绿色工厂标签可作授信加分项；平台建设可用技改贷款。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】厦门数字化能碳管理中心补助≤30% 总投资（≤60 万元）、碳足迹认证≤50% 服务合同（≤20 万元/年）；福州对国家级/省级低零碳工厂在省奖励基础上市级再配套 50%；高企 15% 与研发加计适用软件自研部分。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】碳排放数据失真会触发监管处罚，并直接拖累碳质押融资；核算边界或方法学错误导致结果不被采信；方法学收紧使 CCER 开发受限；碳价波动影响碳资产价值。\n【新增风险与应对】执行风险：排放因子选错、边界不清（应对：第三方核查演练、因子库版本管理）；政策风险：碳市场扩容与 CCER 规则变化（应对：跟踪方法学更新）；市场风险：碳价波动（应对：资产运营与套保组合）；数据合规：碳数据涉企业经营秘密与出口合规，须等保与出境评估。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游枢纽：碳管理上游汇总 EPC 节能量、光伏绿电、EMS 运行数据，折算为碳减排量；下游连接碳配额/CCER 交易节点与绿色金融（碳质押、碳效益挂钩贷款）；没有碳核算，节能成果无法变成碳资产。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某控排水泥厂规范碳管理后，凭 5000 吨 CCER 作质押获得银行流动资金贷款 300 万元，利率较普通流贷下浮 60BP（基点，1BP=0.01%），并同步在银行开立碳资产托管账户。\n【自测题】碳质押融资的『质押率』主要受哪两个因素约束？\n【参考要点】一是碳价波动性与流动性（越波动、越难变现，质押率越低）；二是配额/CCER 的权属清晰度与处置难度。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选纳入全国碳市场的控排企业与有CCER潜力的工厂。某水泥厂年碳排放量大、有减排空间，符合准入；核查其碳核算基础与CCER开发条件，锁定为重点。\n2. 电话初步建联沟通：致电水泥厂安环部，说明规范碳管理既是履约需要、又能把碳资产用于质押融资，我行有碳金融综合服务，核实其配额缺口与融资需求，约现场交流。\n3. 现场初次拜访调研：看主要排放源、能源结构与现有碳核算做法，发现数据分散、口径不一。我留下碳管理与质押融资介绍，约定梳理核算边界并评估CCER可行性。\n4. 全面尽职调查核验：核验核算边界、方法学与排放因子、数据可追溯性；确认规范管理后可开发约5000吨CCER、足以支撑质押融资；评估履约缺口与碳价敏感性，形成尽调意见。\n5. 定制化授信方案洽谈：匹配『碳配额质押融资＋绿色信贷增信』：以CCER质押争取流动贷300万并予利率下浮约60BP；约定碳价盯市与补仓。厂方希望不影响履约，我设计托管+质押安排，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附碳核算报告、CCER权属与登记、碳价分析、质押与托管方案，说明碳资产权属清晰、可处置，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗专项核查碳减排效益真实性与方法学适用性。审查提示碳价波动与清缴冲突风险，要求盯市补仓与处置通道。\n8. 授信审批与出具批复：审贷会关注碳价波动与质押物处置。确认盯市、补仓与托管安排后获批：额度300万、质押率约六成，出具批复。\n9. 合同签署与担保落实：签订借款、CCER质押与托管合同，办妥质押登记；明确违约处置与回购安排，约定履约与还款账户闭环管理。\n10. 放款条件核验与贷款发放：核验CCER登记、质押生效、托管协议与账户闭环后，发放贷款，资金用于补充流动性与技改。\n11. 贷后全流程管理：盯市碳价与质押物市值，监控履约进度与还款账户；每季核验碳核算数据与减排进展，触发阈值即提示补仓，贷后报告持续跟踪。\n12. 到期结清与业务循环：贷款结清、碳资产持续增值。企业扩大CCER开发并统一集团碳托管，我行延伸至碳交易结算与集团授信，形成长期碳金融合作。"
+   }
+  ]
+ },
+ "合同能源管理": {
+  "category": "中游",
+  "aiLink": "合同能源管理是 AI 节能的标准商业模式：别人出钱节能，省下的钱一起分。",
+  "attachments": [
+   {
+    "name": "合同能源管理EMC合同范本.pdf",
+    "url": "./assets/emc-contract-template.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "EMC税收优惠备案指引.pdf",
+    "url": "./assets/emc-tax-guide.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "合同能源管理（EMC）是节能服务公司（ESCO）出资改造、与客户按约定分享节能收益的商业模式，让客户『零首付』也能做节能改造。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『EMC+AI 双轮』：ESCO 以 AI 群控/智慧运维为技术底座做节能改造，工厂零首付，双方按约定比例分享改造后节能收益（分享期一般 3~6 年）。AI 的价值有三：①把节能量算得更准——AI 模型+M&V 双基线，减少『说不清省了多少』的纠纷；②把收益期拉长——预测性维护让节能效果不衰减；③把服务变轻——远程运维替代驻场，ESCO 服务多家工厂摊薄成本。政策端：符合财税〔2010〕110 号条件的 EMC 项目自取得第一笔生产经营收入所属纳税年度起三免三减半、EMC 服务免征增值税；福州对节能服务企业实施的 EMC 项目（年节能量≥300 吨标煤）按 500 元/吨补助、最高 150 万元且不超过投资额 30%。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 商业模式：效益分享型 EMC 为主流——ESCO 出资改造，分享比例通常工厂 60%~80%/ESCO 20%~40%，分享期 3~6 年，期满资产归工厂。\n2. 技术方案：AI 群控（空压/制冷站）+智能监测+预测性维护三件套；节能量按 GB/T 24915 与 M&V 方案核算。\n3. 硬件清单：物联网关、传感器、边缘控制柜；软件：AI 智控平台+效益分享结算系统。\n4. 实施步骤：能源审计→方案与分成谈判→EMC 合同签署（含基准线与违约条款）→改造施工→核证达标→进入分享期。\n5. 预期效果：工厂零投入零风险分享节能收益；ESCO 凭技术+资金获取长期现金流；银行凭分享款放贷。\n6. 数据采集方式：改造前后双基线计量，分享款按月/季按核证节能量结算，凭证链完整。\n7. 可执行颗粒度：1000 万元 EMC 项目、分享期 5 年、年节能收益 260 万元，银行可按 70% 成数放款 700 万元，分享款定向还贷。\n8. 税务动作：ESCO 备案享受三免三减半与免征增值税；工厂支付条款税前扣除，期满资产按折旧期满计税基础入账。\n【业务定义】EMC 有两种典型模式：分享型（ESCO 与客户按比例分享节省的能源费，ESCO 承担主要风险）、保证型（ESCO 保证节能量，未达标由 ESCO 补差）。合同期一般 3~8 年，节能量核证（M&V）是分钱依据。对初学者：EMC 合同是核心风控文本，银行要像审借款合同一样审它。\n【信贷切入点】这是典型的供应链金融场景：设备商＋ESCO＋工厂三方协作。银行可向 ESCO 提供项目融资（以未来节能收益权为还款来源），或向工厂提供置换贷款；常以『节能收益权质押＋ESCO/工厂双重信用』组合授信，并可批量复制给多个工厂。\n【关键数据】分享型/保证型（EMC 模式（决定风险主要由谁承担））；3~8年（合同期（分享期，银行放款宜短于它））；ESCO（融资主体（Energy Service Company，节能服务公司））\n【适用场景】不愿/不能一次性投入但能耗高的客户（现金流紧但有降耗需求）；具备专业技术与资质的 ESCO（有成功案例与核证能力）；集团/园区批量节能改造（打包授信、共享风控）"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】EMC 是合同能源管理贷款的标准场景：银行以节能效益分享款为第一还款来源、以分享期收益权质押；额度约总投资 70%、期限匹配分享期（宜短于分享期留安全边际）；亦可组合融资租赁（ESCO 设备）与补贴监管账户优先还贷安排。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】三免三减半+EMC 服务免征增值税（财税〔2010〕110 号、2013 年第 77 号公告征管）；福州 EMC 项目 500 元/吨标煤补助（≥300 吨，≤150 万元）；ESCO 若是高企可叠加 15% 优惠税率与研发费 100% 加计扣除。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】节能量未达标引发分享纠纷；客户破产致分享收益中断；ESCO 资质弱、拿了钱不履约；合同条款不清（基准线、结算周期、设备归属）留下隐患。\n【新增风险与应对】执行风险：节能效果不及测算、ESCO 运维掉线（应对：M&V 双基线、验收节点分期、违约与设备留置条款）；政策风险：税收优惠条件变化（应对：备案资料留存备查）；市场风险：工厂经营恶化拒付分享款（应对：加速到期+设备抵押）；数据合规：分享结算数据双方共管、约定保密与审计权。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "中游商业模式枢纽：EMC 上游集成 EPC（工程实施）、AI 群控（技术）、能耗监测（核证），下游连接工厂客户（零投入享节能）与银行（分享款还款）；碳管理系统把节能量折算碳资产；是整条图谱中『技术-资金-税务』三角关系的交汇点。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某 ESCO 为三家工厂做 LED 照明＋空压系统改造，以分享期 6 年的节能收益权质押，获得银行批量项目贷款 1500 万元。银行按工厂逐户核验放款，并锁定各厂结算电费账户回行，实现闭环归集。\n【自测题】EMC『保证型』与『分享型』在银行风控上，对 ESCO 的现金流要求有何不同？\n【参考要点】保证型下 ESCO 承担补差责任、现金流压力更大，银行应重点评估其补差能力与担保；分享型下风险共担，更依赖节能量核证。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选有节能需求但缺一次性资金的工厂与有资质的ESCo。某ESCo技术扎实、有三家工厂改造意向，符合准入；核查其资金垫付能力与核证能力，锁定为批量授信对象。\n2. 电话初步建联沟通：致电ESCo负责人，说明我行可基于节能收益权为其项目融资、支持批量复制，核实其资金缺口约1500万与三家工厂清单，约看项目与工厂。\n3. 现场初次拜访调研：随ESCo看三家工厂的LED与空压系统，评估各厂节能潜力与付费能力。ESCo关心回款与核证，我留下EMC融资介绍，约定收集各厂能耗与合同草案。\n4. 全面尽职调查核验：核验ESCo资质、技术方案与成功案例；逐户核验三家工厂经营、能耗与付费能力；确认分享期6年、收益权可确权可质押，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『EMC项目融资＋节能收益权质押』：额度1500万，按工厂分批放款，期限匹配分享期；约定各厂结算电费账户回行归集。ESCo希望灵活提款，我设节点条件，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附ESCo资质、三厂资料、EMC合同、收益权质押与分批方案，说明以分享收益为还款来源、按户风控，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验节能量核证机制与效益真实性。审查提示客户破产与ESCo履约风险，要求双重信用与分批控制。\n8. 授信审批与出具批复：审贷会关注ESCo履约与三厂信用。确认分批放款、收益权质押与账户归集后获批：额度1500万，出具批复并明确按户核验放款。\n9. 合同签署与担保落实：签订借款、节能收益权质押合同，办妥登记；逐户确认EMC合同的基准线、分享比例与结算条款齐备，作为对应工厂放款前提。\n10. 放款条件核验与贷款发放：按工厂逐个核验改造完成与M&V核证后，受托支付发放对应批次贷款，资金直达项目，未达标工厂暂缓。\n11. 贷后全流程管理：按户监测分享款到账与节能量兑现，监控ESCo运营；一厂经营波动致分享延迟，及时启动催收与担保措施，贷后报告分户记录。\n12. 到期结清与业务循环：贷款分批结清。ESCo复制到更多工厂，我行以标准化模型批量续作，并延伸供应链金融至设备商，形成长期闭环。"
+   }
+  ]
+ },
+ "项目前期贷": {
+  "category": "金融服务",
+  "aiLink": "AI 让前期费用的测算与提款节奏更精准，前期贷做到『一笔钱只干一件事』。",
+  "attachments": [
+   {
+    "name": "项目前期贷产品手册.pdf",
+    "url": "./assets/preloan-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "前期费用科目台账模板.xlsx",
+    "url": "./assets/preloan-ledger.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "零碳工厂在立项备案、可研环评、设备招标等开工前阶段处处要花钱，固定资产贷款却还没法申报——项目前期贷专补这个资金空档：资金严格匹配前期合规支出，等项目资本金落地、固贷获批，直接用固贷资金闭环还款。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『前期投入的测算与管控』：①AI 负荷模拟——项目备案阶段即可基于厂房面积、工艺方案预测建成后用能负荷，测算节能改造潜力与绿电配置比例，为授信额度测算提供依据；②前期费用结构化——AI 把可研、环评、勘察设计、设备招标等前期支出按科目自动归集，与贷款用途一一对应，满足专款专用与凭证审核；③现金流预测——模拟固贷放款时点与前期贷置换路径，生成闭环还款计划；④风险预警——跟踪项目审批节点，延误即触发提款调整，避免资金闲置。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 测算方案：用 AI 负荷模拟工具（输入厂房面积/工艺/班次）输出 96 点负荷曲线与年用电量，作为前期贷额度与后续固贷方案的共同底稿。\n2. 用途管控：建立前期费用科目台账（可研/环评/勘察/招标四类），每笔提款对应合同编号与发票，行内系统自动校验。\n3. 数据接入：项目审批系统（备案/环评受理回执）与行内信贷系统打通，节点变化自动推送客户经理。\n4. 实施步骤：备案文件核验→AI 测算与额度核定→合同约定置换条款→按节点受托支付→固贷预审同步介入。\n5. 预期效果：资金闲置率降到 5% 以下；置换时点无缝衔接，企业综合融资成本下降 10%~15%。\n6. 可执行颗粒度：800 万元前期贷按四类科目分笔，单笔不低于 50 万元，凭证审核 T+1 完成。\n7. 接口方式：银行侧开放网银短 E 贷/提款接口；企业侧对接财务系统付款审批流。\n【业务定义】项目前期贷依据《固定资产贷款管理暂行办法》发放，用于借款人提前采购设备、建设物资或其他合理的前期项目建设费用支出，期限匹配项目前期筹备周期。核心性质有三：依附性——为后续项目贷款做融资铺垫；过渡性——项目获批、资本金筹措完成、固贷放款后，优先以固贷资金闭环偿还本笔贷款；政策性导向——信贷投放贴合产业投向指引，优先支持基建、民生与战略性新兴产业。对初学者：它不是一笔独立的钱，而是项目融资链条的第一环。\n【信贷切入点】信贷切入点在于『手续真实、衔接清晰』。项目应已取得审批、核准或备案，企业持有立项备案、土地预审、环评任一官方受理文件；还款来源锁定后续固贷放款，授信合同可提前约定置换路径；无需项目资本金足额到位，准入门槛相对灵活；线上按需分次提款，避免资金闲置。\n【关键数据】3000万起（办理前提：在我行取得不低于3000万的短期流动资金贷款授信并开通短E贷（口径以当地分行为准））；闭环（还款来源=后续固定资产贷款放款资金）；LPR优惠（贴合新能源扶持政策的优惠定价）\n【适用场景】地方国有基建平台、实体制造业项目建设主体的零碳项目前期筹备；新能源投资运营企业新建产业园、风电光伏项目立项阶段；民生基建（医疗卫生、科教基建、城市更新）项目的前期费用支出；企业技改/改扩建项目的方案设计与设备招标集中支出阶段"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】项目前期贷：额度 800 万~3000 万级、期限约 1 年，第一还款来源锁定后续固定资产贷款放款，授信合同提前约定置换路径；办理前提为在我行取得不低于 3000 万元短期流动资金贷款授信并开通短 E 贷（口径以当地分行为准）。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】项目本身后续可申报福州节能改造补助与低零碳工厂认定奖励；前期费用中的数智化咨询投入符合技术合同登记的可纳入研发费加计扣除范围。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】项目未获批或立项注销，前期支出失去依托、贷款用途落空；固贷衔接失败，闭环置换无从实现；资金被挪用于日常周转（违反专款专用）；征信有逾期欠息、失信被执行、实控人负面记录导致准入失败；房地产行业禁止准入。\n【新增风险与应对】执行风险：项目未获批导致用途落空（应对：备案/环评受理文件作为放款前提、分次提款）；政策风险：资本金比例要求变化（应对：按最新监管口径预留）；市场风险：建设延期（应对：置换条款设宽限期与担保补足）；数据合规：项目可研数据涉商业秘密（保密协议）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "金融链第一环：前期贷是项目从『纸』到『地』的启动资金，上游连接政府审批与可研环评机构，下游必然衔接固定资产贷款（闭环置换）与厂房贷；AI 测算把三者串成可验证的融资时间表。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某民营新能源制造企业新建零碳产业园，刚拿到发改备案，可研、环评、勘察设计加上首批设备招标约需800万，自有资金要留作资本金。我行匹配项目前期贷：额度800万、期限1年、LPR优惠定价，资金定向支付前期合规支出；同步介入后续固贷预审，项目开工后以固贷资金闭环置换，企业资金零闲置。\n【自测题】项目前期贷的第一还款来源是什么？为什么说它具有『过渡性』？\n【参考要点】第一还款来源锁定后续固定资产贷款的放款资金；前期贷只覆盖固贷申报前的资金空档，项目获批、资本金到位、固贷放款后即被置换偿还、退出项目，故称过渡性。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：翻开支行梳理的新能源制造企业名单，逐户核查项目阶段：某企业零碳产业园刚获发改备案、前期费用集中；另一企业尚在可研、无备案受理文件，先剔除。锁定已备案的新能源制造企业为重点。\n2. 电话初步建联沟通：致电王总，得知产业园备案刚批，可研、环评、勘察设计加上首批设备招标约需800万，自有资金要留作后续资本金。我介绍项目前期贷正好覆盖这个空档、固贷获批后还能闭环置换，约下周看项目。\n3. 现场初次拜访调研：进园区看地块与备案文件，核对可研进度与开工时间表。王总担心前期花钱杂、银行不认。我留下资料清单，提示资金须严格匹配前期合规支出，约定补充环评受理文件。\n4. 全面尽职调查核验：核验备案文件、环评受理回执、近3年同类项目履历与征信记录；查财务在建工程科目新增与经营现金流，确认后期筹措资本金能力。还款来源锁定后续固贷放款，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配项目前期贷：额度800万、期限1年、LPR优惠定价，资金定向支付前期合规支出；授信合同提前约定固贷置换路径，同步启动固贷预审。王总认可资金不闲置的安排，敲定核心条款。\n6. 授信报告撰写与申报：撰写授信报告，附备案与环评文件、前期费用清单、同类项目履历、固贷衔接方案，说明第一还款来源为固贷放款资金，按流程提交支行上报分行。\n7. 风险审查与绿色专项审核：风控核查用途合规与固贷衔接可行性；绿色专项岗认定项目符合产业投向与新能源扶持政策。审查提示项目获批不确定与用途挪用风险，要求分次提款、凭证审核。\n8. 授信审批与出具批复：审贷会关注前期手续完备性与置换路径可靠性。补充说明资本金安排后获批：额度800万、期限1年，明确固贷放款后优先偿还本笔前期贷。\n9. 合同签署与担保落实：签订借款合同与担保合同，写入资金定向支付、固贷置换、凭证审核条款；办妥担保登记，确认提款节奏与前期合规支出节点绑定。\n10. 放款条件核验与贷款发放：核验前期合规支出凭证（可研合同、环评受理、招标文件）后，按节点受托支付至对手方，资金直达项目、不落企业账户。\n11. 贷后全流程管理：按季跟踪备案进展、前期支出进度与固贷申报节奏；一次设备招标延迟，及时暂缓对应提款，避免资金闲置，贷后报告如实记录。\n12. 到期结清与业务循环：固贷获批放款，前期贷闭环置换、本息结清。产业园二期开工，我行以固贷+厂房贷+代发组合跟进，形成全周期合作。"
+   }
+  ]
+ },
+ "固定资产贷款": {
+  "category": "金融服务",
+  "aiLink": "AI 排产让固贷项目按期投产，现金流按时到位，还款来源才成立。",
+  "attachments": [
+   {
+    "name": "固定资产贷款产品手册.pdf",
+    "url": "./assets/faloan-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "固贷四节点放款检查清单.pdf",
+    "url": "./assets/faloan-checklist.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "零碳工厂正式开工后的长期建设投入——厂房建设、产线设备购置、工程安装——靠固定资产贷款支撑：期限匹配建设周期与投产节奏，专款专用、线上提款查账，是企业实体扩张、产能升级的核心对公信贷产品。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『建设期与运营期的全周期优化』：①建设期——AI 进度模拟（BIM+进度数据）预判工期与提款节奏，贷款分笔与工程节点绑定；②产线设计——AI 负荷仿真优化产线配置与绿电/储能配比，使建成后单位产品能耗直达行业标杆；③投产爬坡——AI 排产+AI 群控联动，缩短调试期、快速达到设计产能与节能量；④贷后——在线监测数据直连银行，项目现金流与 DSCR 实时可见。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 测算方案：AI 产线负荷仿真输出设备级能耗模型，反向优化设备选型与投产顺序，目标单位产品能耗达国家标杆值。\n2. 进度管控：固贷分笔发放绑定『基础完成→设备到货→安装调试→试生产』四节点，每节点上传影像与验收单。\n3. 数据接入：项目进度系统+能耗在线监测系统双数据源，银行贷后模块按季自动抓取。\n4. 实施步骤：可研与 AI 仿真（1~2 个月）→四证办理→授信申报→分笔受托支付→投产核验。\n5. 预期效果：工期缩短 5%~10%；投产后 6 个月内达到设计产能；DSCR 稳定在 1.2 以上。\n6. 可执行颗粒度：8400 万元固贷按 30%/40%/30% 三笔发放，每笔对应工程量清单与发票。\n7. 接口方式：银行网银支持线上提款/查账/凭证下载；企业侧 ERP 项目模块对接。\n【业务定义】固定资产贷款指向法人或非法人组织发放的、用于固定资产投资（固定资产的建设、购置、改造）的本外币贷款，期限一般不超过十年，属中长期专项贷款。四大特征：项目制——依托具体项目立项审批，以项目未来经营现金流为核心还款来源；专项性——资金用途刚性锁定，严禁流入流动资金周转、楼市、股市；中长期——贴合建设周期与回报周期；监管合规——执行资本金、四证齐全、贷后跟踪等硬性要求。\n【信贷切入点】信贷切入点在于『项目实、期限配、用途清』。项目立项、备案、环评、用地、规划等核心手续齐全；用途为厂房建设、设备购置、技改升级，有合同、预算、可研佐证；资本金比例不低于行业监管最低标准且自有资金已部分到位；连续2年及以上盈利、净利润率≥3% 的经营主体优先。\n【关键数据】≤10年（贷款期限上限（匹配建设与回报周期））；≥3%（主营业务净利润率门槛（连续2年盈利））；资本金（比例不低于行业监管最低标准、自有资金已部分到位）\n【适用场景】零碳工厂新建厂房、扩大产能的长期建设投入；产线设备购置与工程安装（有合同、预算、可研佐证）；技改升级类固定资产投资（归属国家鼓励类、支持类产业）"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】固定资产贷款：额度约总投资 70%（如 8400 万/1.2 亿）、期限≤10 年、按建设节点分笔受托支付；准入要求连续 2 年盈利、净利润率≥3%、资本金比例不低于行业监管最低标准；利率执行绿色信贷优惠，符合碳减排支持工具范围的按本金 60%、利率 1.75% 获低成本资金；可叠加 SLL 碳 KPI 挂钩降息。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】设备投资适用设备更新专项与超长期特别国债支持方向；专用设备数智化改造投入 10% 抵免（2024~2027）；项目投产达绿色工厂标准福州再奖 20 万元、国家级再配套。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】资金被挪用于流动资金周转或楼市股市（违反专款专用监管）；项目手续不全、四证缺失引发合规风险；建设超支、工期延误影响投产与还款；资本金缺口大、自有资金未真实到位；经营恶化导致现金流断裂。\n【新增风险与应对】执行风险：建设超支与工期延误（应对：分笔发放+超支自筹条款+进度预警）；政策风险：四证与资本金监管口径变化（应对：放款前逐项核验）；市场风险：产品价格下行影响达产收益（应对：订单/意向协议作为授信佐证、敏感性分析）；数据合规：项目数据与财务数据分级授权。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "金融链中枢：固贷是零碳工厂建设期的主资金入口，上游衔接前期贷（资本金到位后置换），下游衔接厂房贷（不动产购置）、代发（用工）与 EMS/监测（运营期能效）；AI 让『建设-投产-达产』每一步可验证，还款来源才稳。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某零碳工厂新建储能产线，总投资1.2亿，我行匹配10年期固定资产贷款8400万（七成）：按建设节点分三笔受托支付，利率执行绿色信贷优惠；项目投产后以经营现金流还款，企业线上自主提款查账，不占用短期周转额度。\n【自测题】固定资产贷款的『专项性』体现在哪里？资金用途有哪些禁区？\n【参考要点】资金用途刚性锁定、专款专用，须有合同、预算、可研佐证；严禁流入流动资金周转、楼市、股市等非固定资产投资领域，贷后持续跟踪、违规可提前收回。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：梳理有扩产计划的制造企业，核查盈利与项目手续：某零碳工厂连续2年盈利、净利润率4%，储能产线已备案；另一企业近一年亏损，暂不符合经营门槛，先剔除。\n2. 电话初步建联沟通：致电李总，确认产线总投资1.2亿、资本金三成、贷款需求8400万、期限希望10年。我介绍固定资产贷款匹配建设周期、线上提款查账，约看项目现场。\n3. 现场初次拜访调研：看开工准备、场地与设备招标进度，核对四证办理情况。李总关心日常周转会不会被挤占，我说明固贷专项专用、不占流贷额度，留下资料清单。\n4. 全面尽职调查核验：核验立项、备案、环评、用地、规划等手续，审近两年财报与资本金到位计划；确认还款来源为产线投产后的经营现金流，形成底稿。\n5. 定制化授信方案洽谈：匹配固定资产贷款：8400万、10年、按建设节点分三笔受托支付，利率执行绿色信贷优惠；李总要留足备货资金，我说明专项专用正是为保障经营现金流。\n6. 授信报告撰写与申报：撰写授信报告，附可研、四证、财报、资本金证明与资金用途清单，说明期限匹配投产节奏、用途闭环可查，提交审批。\n7. 风险审查与绿色专项审核：风控核查资本金真实与用途合规；绿色专项岗认定属鼓励类产业。审查提示超支与工期风险，要求按进度分笔发放、贷后跟踪。\n8. 授信审批与出具批复：审贷会关注盈利持续性与四证完备。补充资本金来源说明后获批：8400万、10年、分笔受托支付，出具正式批复。\n9. 合同签署与担保落实：签订借款合同与抵押合同，约定资金封闭运行、用途清单管理、超支自筹；办妥抵押登记。\n10. 放款条件核验与贷款发放：按工程进度核验设备合同、发票与监理报告，分笔受托支付至设备方与施工方，资金与进度匹配。\n11. 贷后全流程管理：线上监测提款与用途，按季看项目进度与经营；一次辅材款超付及时核正，未形成挪用；产线调试期加密跟踪。\n12. 到期结清与业务循环：产线投产、订单落地，贷款进入正常还款周期。企业二期待建，我行以固贷+代发+结算组合延续合作。"
+   }
+  ]
+ },
+ "工业厂房贷": {
+  "category": "金融服务",
+  "aiLink": "AI 把厂房的能耗模拟前置到购置前，买对了房子才能省下后期的电。",
+  "attachments": [
+   {
+    "name": "工业厂房贷产品手册.pdf",
+    "url": "./assets/plant-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "厂房能耗仿真对比报告模板.pdf",
+    "url": "./assets/plant-sim-template.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "零碳工厂若新建或改建标准工业厂房（自用生产或园区运营），工业厂房贷提供大额、长期、灵活的中长期专项支持——单户最高5000万、期限最长10年，高度匹配园区前期投入大、回报周期长的运营特点。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『购置决策的能耗预演+园区智慧运营』：①购置前 AI 能耗模拟——基于厂房面积、层高、窗墙比、所在地气象数据，模拟空调/照明/动力负荷，比较不同厂房的终身能耗成本，辅助选型谈判；②园区智慧运营——AI 招商与能效双模型，动态调整公共能耗（中央空调/公区照明/充电桩）运行策略，提升出租率与租金议价力；③绿色标签溢价——AI 碳核算支撑厂房取得零碳/绿色认证，租金溢价 3%~8%。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 测算方案：AI 能耗仿真对比 2~3 个候选厂房，输出 20 年总能耗成本与减碳潜力报告，作为购置决策与授信申报附件。\n2. 改造方案：购入后即部署公区 AI 群控（中央空调+照明+充电桩有序充电），公共能耗下降 15%~25%。\n3. 硬件清单：公区智能照明、空调群控、充电桩、物联网关；软件：园区智慧运营平台。\n4. 数据接入：平台与出租户分户计量打通，支持分户缴费与能耗公示。\n5. 实施步骤：候选厂房能耗仿真→购置谈判（用数据压价）→抵押登记→公区智控改造→招商运营。\n6. 预期效果：公共能耗降 15%~25%；零碳认证厂房出租率与租金双升；入驻企业享绿电直供溢价。\n7. 可执行颗粒度：3 万㎡标准厂房公区智控改造投资约 60~100 万元，年省公共电费约 25~40 万元。\n8. 金融衔接：购置用厂房贷、公区改造用技改贷/EMC，租金现金流合并测算 DSCR。\n【业务定义】工业厂房贷是对公固定资产贷款的细分产品，指向合法存续的企事业法人、产业园区运营主体及其他合规经济组织发放的、用于购买一手/二手标准工业厂房的中长期贷款。标准厂房指在经济开发区或工业集中区内按国家标准统一设计建设、配套齐全、可直接入驻的工业用房（含生产车间、仓储库房及厂区道路、消防、水电暖通等附属设施）。\n【信贷切入点】信贷切入点在于『产权清、用途实、抵押实』。厂房须产权明晰、无法律纠纷、变现能力强；用地为出让性质的工业、物流仓储或科教用地；授信以工业不动产抵押为主，还款来源覆盖厂房运营收益与企业整体经营现金流；不占用短期流动资金额度。\n【关键数据】5000万上限（单户贷款金额上限（含））；≤10年（贷款期限上限（且不超过经营/存续期限））；70%（贷款成数上限（购置价与评估价孰低，首付≥30%））\n【适用场景】规模以上工业制造企业、中小微生产型企业购买一手/二手标准厂房自用；专精特新企业、产业园区运营企业的厂房购置与园区开发运营；零碳工厂配套的科研用房、仓储库房等厂区附属设施购置"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】工业厂房贷：单户≤5000 万元、期限≤10 年（且不超经营期限）、成数≤购置价与评估价孰低的 70%、首付≥30%，以所购厂房抵押；还款来源=厂房运营收益+企业经营现金流；可叠加利率挂钩降碳 KPI 的绿色激励贷与公区改造 EMC。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】厂房取得零碳/绿色认证可申报福州低零碳工厂配套（省奖励基础上市级再 50%）与厦门低零碳工厂 20 万/50 万元；公区智控改造投入适用 10% 抵免；入驻新能源配套产业符合福州重点支持方向。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】产权纠纷或法律瑕疵影响抵押变现；与开发企业关联交易规避准入；高耗能、高污染、淘汰类产业及纯贸易、房地产住宅类主体禁入；土地性质不符（非出让、非工业用地）；园区空置率上升导致运营收益不达预期。\n【新增风险与应对】执行风险：产权瑕疵与关联交易（应对：产权核查+非关联承诺+价格评估）；政策风险：土地性质与用途管制（应对：出让工业用地、排除划拨与商住）；市场风险：空置率上升（应对：招商意向协议作为授信佐证、按季监测入驻率）；数据合规：租户用能数据分户隔离、脱敏使用。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "不动产支点：厂房贷上游衔接固贷（建设资金）与前期贷，下游衔接园区运营（出租/入驻企业用能）与代发（入驻企业用工）；AI 能耗仿真把『买厂房』从重资产决策变成数据决策，是园区型零碳项目的起点。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某园区服务管理企业分三期开发智造中心，二期需购置标准厂房。我行匹配5年期工业厂房贷：额度3500万、成数七成，以所购厂房抵押；中长期期限匹配重资产建设投入，企业依托招商租赁收入还款，园区开发资金需求一次落地。\n【自测题】工业厂房贷对『用房』和『用地』有哪些硬性要求？\n【参考要点】厂房须为经开区/工业集中区内按国标建设的标准厂房（含车间、仓储及附属设施），产权清晰、可处置；用地须为出让性质的工业、物流仓储或科教用地——住宅、商业及划拨用地均不符合准入。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：从园区运营与规上制造企业中筛购厂需求，核查用地与产权：某企业想买划拨工业用地厂房，不符合准入先剔除；锁定园区服务公司智造中心二期购置标准厂房需求。\n2. 电话初步建联沟通：致电陈总，确认二期购置标准厂房总价5000万、资金缺口3500万、期望期限5年。我介绍工业厂房贷成数七成、期限最长10年，约看园区。\n3. 现场初次拜访调研：看一期招商运营与二期规划，核对土地证（出让、工业用地）与可售房源清单。陈总担心还款压力，我说明可按招商进度设计还款，留下资料清单。\n4. 全面尽职调查核验：核验产权清晰无纠纷、与开发企业非关联、经营年限与征信；调查招商意向与租金水平，确认还款来源为租金加经营现金流，形成底稿。\n5. 定制化授信方案洽谈：匹配工业厂房贷：3500万、5年、七成、所购厂房抵押；按入驻进度设计前低后高还款计划，陈总认可，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附产权与用地文件、招商意向、财报与抵押方案，说明抵押变现能力与去化可行性，提交审批。\n7. 风险审查与绿色专项审核：风控核查抵押变现与关联关系；绿色专项岗认定新能源配套园区符合产业导向。审查提示空置风险，要求按季监测入驻率。\n8. 授信审批与出具批复：审贷会关注产权瑕疵与去化速度。补充周边园区入驻数据后获批：3500万、5年、房产抵押，出具批复。\n9. 合同签署与担保落实：签订借款合同、抵押合同，办妥抵押登记；再次核查买卖双方非关联，交易价格公允。\n10. 放款条件核验与贷款发放：核验过户完成、抵押登记生效后，受托支付至开发企业账户，资金直达交易。\n11. 贷后全流程管理：按季跟踪招商入驻率与租金到账；一次大客户退租触发关注，督促招商并监测还款，偿债仍达标，贷后报告如实反映。\n12. 到期结清与业务循环：二期招商达标、租金稳定，贷款按期结清。三期开发启动，我行联动代发工资与结算业务，深化园区综合服务。"
+   }
+  ]
+ },
+ "绿色项目贷/固定资产贷/供应链金融": {
+  "category": "金融服务",
+  "aiLink": "AI 风控把绿色项目的『真绿色、真现金流』算清楚，银行才敢贷、愿贷、便宜贷。",
+  "attachments": [
+   {
+    "name": "绿色项目贷款产品手册.pdf",
+    "url": "./assets/loan-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "碳减排挂钩贷款操作要点.pdf",
+    "url": "./assets/loan-carbon-linked.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "绿色项目贷款、固定资产贷款与供应链金融，是零碳工厂融资的『主动脉』——为光伏、储能、节能改造等绿色项目提供中长期资金，并向上游设备供应商延伸配套融资。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『授信决策智能化』：①AI 尽调——自动抓取企业用能、税务、征信、司法数据，交叉验证绿色属性（是否属于绿色目录、节能量是否可核证）；②现金流预测——基于负荷与电价模型预测项目收入，替代人工 Excel，压力测试秒级完成；③贷后预警——在线监测数据异常（发电量骤降、分享款逾期）自动预警；④碳 KPI 挂钩——利率与年度减排量挂钩，达标降息，AI 持续跟踪核证。兴业银行厦门分行已落地碳减排/碳效益挂钩贷款 8 笔、金额超 1.25 亿元，支持项目年节标煤超 5600 吨、减排 CO₂ 超 1.4 万吨。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 授信逻辑：第一还款来源=项目可测算现金流（售电/分享款/租金），担保=收益权质押+设备/房产抵押+实控人保证，期限匹配回收期。\n2. AI 尽调清单：营业执照/征信/近三年财报/用电流水/项目四证/合同发票/第三方核证报告，结构化入库。\n3. 数据接入：企业能耗在线监测系统→银行贷后模块 API；分享款回款账户闭环监测。\n4. 实施步骤：AI 初筛（分钟级）→现场尽调→模型定价（绿金优惠+SLL 挂钩）→审批→放款→在线贷后。\n5. 预期效果：尽调周期从 4~6 周缩短到 2~3 周；风险预警提前 1~3 个月。\n6. 可执行颗粒度：绿色项目贷额度=总投资×70%，利率=绿色信贷优惠价，挂钩 KPI 达标次年降 10~30BP。\n7. 合规要点：资金用途闭环管理（受托支付），贷后按季核查用途与节能量。\n【业务定义】固定资产贷款用于企业购建固定资产（厂房、设备）；绿色项目贷款是其中资金用途符合绿色目录、享受利率与统计优惠的品种；供应链金融则围绕核心企业，为其上下游（如光伏组件商、ESCO）提供基于真实贸易的融资。三者组合，能覆盖零碳工厂『建设—运营—采购』全链条的资金需求。\n【信贷切入点】这是银行对公绿色信贷的核心产品组合，应坚持全流程管理：项目可研→环评→并网批复→收益权评估→组合担保→贷后监测。初学者记住三个匹配：贷款期限与现金流回收期匹配、成数与风险匹配、担保方式与风险点匹配。\n【关键数据】3.0~4.0%（绿色贷款利率（示例区间，通常低于普通流贷））；10~15年（电站类贷款期限（与项目回收期匹配））；70~80%（贷款成数（贷款占总投资，其余为资本金））；专项统计（绿色信贷口径（纳入央行绿色信贷统计与考核））\n【适用场景】投资明确、收益可测、主体信用良好的绿色项目；有真实贸易背景、需配套融资的设备供应商；希望拉长负债结构、锁定成本的制造企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】产品组合：绿色项目贷款/固定资产贷款/供应链金融为核心，叠加人行碳减排支持工具（按贷款本金 60%、利率 1.75% 提供低成本资金）、SLL 利率挂钩、票据贴现（绿票通）与融资租赁；供应链场景围绕核心企业应付账款放款。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】贷款利率优惠本身是政策红利（碳减排支持工具+绿色信贷优惠）；银行侧可申请支农支小再贷款等结构性工具；企业端补助进监管账户优先还贷的安排让政策与金融闭环。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】现金流不及测算、电价退坡、担保物贬值形成偿债缺口；资本金不到位、工程超支；项目完工风险（建不下去）；绿色属性认定不通过导致优惠落空。\n【新增风险与应对】执行风险：用途挪用与数据造假（应对：受托支付+在线监测+双人核证）；政策风险：绿色目录与工具范围调整（应对：跟踪目录版本）；市场风险：电价/产品价格波动（应对：敏感性+担保补足条款）；数据合规：企业财务与用能数据分级授权、等保三级。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "金融中枢：综合融资节点上游承接所有项目节点的融资需求（EPC/光伏/储能/厂房/EMC），下游连接企业客户的结算与代发；AI 让『绿色认定-额度核定-利率定价-贷后预警』全链条数据化，是银行绿色金融能力的集中体现。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某园区 10MW（兆瓦）光储一体化项目：总投资 6000 万元，获绿色项目贷款 4200 万元（七成）、期限 12 年、利率 3.6%，以电费＋储能套利收益权质押、设备抵押。年现金流约 700 万元，DSCR（偿债覆盖率）约 1.3，覆盖本息有余量。\n【自测题】绿色信贷『专项统计』口径对银行意味着什么约束？\n【参考要点】意味着资金用途须真实绿色、纳入央行绿色贷款专项统计、接受信息披露与节能环保考核，不能‘漂绿’。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：梳理园区光储一体化与设备供应商两类客户。某园区10MW光储项目总投资约6000万、有明确收益测算，符合准入；其组件商有配套融资需求，一并购入清单，剔除资料缺失、主体不明的两家。\n2. 电话初步建联沟通：致电园区负责人，介绍我行绿色项目贷可覆盖七成、期限最长15年、利率优惠，还能为上游组件商配套供应链金融，核实其贷款需求约4200万与开工计划，约现场看项目。\n3. 现场初次拜访调研：看场地、屋顶/地块、并网点与储能布点，了解建设进度与收益来源（电费+储能套利）。园区关心成数与放款节奏，我留下产品手册，约定收集可研、环评与并网资料。\n4. 全面尽职调查核验：审可研、环评、并网批复、PPA/用电协议与收益测算；核验资本金到位与股东实力；测算DSCR约1.3。同步核验组件商贸易背景，形成项目+供应链两套尽调底稿。\n5. 定制化授信方案洽谈：匹配『绿色项目贷款』：额度4200万、七成，期限12年，利率3.6%，以电费+储能套利收益权质押加设备抵押；为组件商配套银承+保理。敲定项目核心条款与供应链额度安排。\n6. 授信报告撰写与申报：撰写授信报告（项目+供应链两户），附可研、环评、并网、收益与压力测试、担保方案，说明现金流稳定、组合担保到位，按流程提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗认定属清洁能源+储能目录、核算年减排量。审查提示电价退坡与完工风险，要求压力测试与完工担保、分期放款。\n8. 授信审批与出具批复：审贷会关注收益稳定性与完工风险。确认DSCR、压力测试、担保与分批放款后，项目贷款4200万与供应链额度一并获批，出具正式批复。\n9. 合同签署与担保落实：签订项目借款、收益权质押、设备抵押合同与组件商银承、保理协议，办妥登记；确认可研、环评、并网手续齐备，组件商贸易背景确权。\n10. 放款条件核验与贷款发放：核验资本金到位、开工与设备招标、担保登记后，按建设节点受托支付；供应链业务凭确权合同与发票放款，资金直达交易对手。\n11. 贷后全流程管理：按季跟踪建设进度与并网计划，投产后监测发电量、储能收益与结算；同步监控组件商回款与贸易连续性。每年做电价压力测试，动态评估DSCR并出具贷后报告。\n12. 到期结清与业务循环：贷款按期结清、项目稳定运营。园区二期扩容、组件商扩大供货，我行以更低成本续做项目贷并放大供应链额度，形成长期闭环。"
+   }
+  ]
+ },
+ "碳配额质押融资/碳金融": {
+  "category": "金融服务",
+  "aiLink": "AI 碳核算与碳价预测，让碳资产从报表数字变成可质押、可交易的现金。",
+  "attachments": [
+   {
+    "name": "碳配额质押融资业务指引.pdf",
+    "url": "./assets/carbonfin-pledge.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "碳价预测与质押率管理说明.pdf",
+    "url": "./assets/carbonfin-pricing.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "碳配额质押融资是以企业持有的碳排放配额或 CCER 为质押物发放的贷款，配套碳回购、碳远期等工具，是把『碳资产』变成『现金』的轻资本业务。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『碳资产的确权与估值』：①AI 碳核算——自动核算配额盈亏与 CCER 可开发量，替代人工盘查，满足 MRV 要求；②碳价预测——结合政策与市场数据预测 CEA/CCER 价格走势，给出持有/卖出/质押建议；③质押动态管理——实时监测质押物价值与质押率，跌破阈值自动补仓提示；④收益建模——把碳收益纳入项目现金流，提升授信测算空间。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：碳配额质押贷款——以 CEA/CCER 作质押，不用卖掉资产即可融资；额度按质押物市值×质押率（一般 50%~70%）。\n2. AI 核算要点：范围一/二排放自动计算，配额清缴义务年度测算，CCER 抵销比例≤5% 规则内置。\n3. 数据接入：对接全国碳市场注册登记与交易系统数据+企业能碳平台；价格数据日级更新。\n4. 实施步骤：碳家底核算（1~2 个月）→质押登记→放款→动态估值与补仓管理。\n5. 预期效果：盘活碳资产千万元级；质押融资成本较流贷低 10%~20%。\n6. 可执行颗粒度：持有 10 万吨配额的企业，按 60% 质押率、碳价 90 元/吨测算，可融约 540 万元。\n7. 风险对冲：AI 价格预警+质押率动态调整+补仓通知机制。\n【业务定义】控排企业每年要上缴碳配额履约，配额有市价、可交易，因而像仓单一样可质押。银行按碳价的一定比例（质押率）放款，企业不用卖碳就能拿到流动资金。配套的碳回购（今天卖碳、约定明天买回）与碳远期可帮企业管理碳价风险。对初学者：碳价会波动，所以必须盯市和设补仓。\n【信贷切入点】银行需建立碳价盯市、补仓与处置机制；质押登记与权属核验是风控关键。这类业务资本占用低、能体现银行碳金融服务能力，还可与碳托管、碳交易结算打包，提升客户粘性。\n【关键数据】50~80%（质押率（贷款/质押物市值，碳价波动大故不算高））；≤1年（期限（碳价波动大，宜做短期））；50~100元/吨（碳价（每吨二氧化碳配额的价格，示例区间））\n【适用场景】持有可观配额/CCER 的控排企业或 CCER 项目业主；有短期流动性需求、不想在碳价低点割肉卖碳的企业；希望一站式办理碳托管＋融资＋交易的客户"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】碳配额质押融资+碳效益挂钩贷款+碳回购；还款来源=碳资产处置收益或企业经营现金流；质押率 50%~70%、逐日估值；利率可与年度减排量 KPI 挂钩降息。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】厦门对域内开发并核证 CCER 的企业按出售量每千吨 CO₂e 奖励 1 万元（每年≤20 万元）；碳质押本身享绿色信贷贴息与碳减排支持工具联动；高企 15% 适用碳软件开发企业。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】碳价波动致质押物贬值、触发平仓；配额清缴缺口（质押的配额恰是履约要用的）；质押登记与处置难（二级市场流动性有限）；政策与方法学变动。\n【新增风险与应对】执行风险：核算错误导致清缴缺口（应对：第三方核查+双人复核）；政策风险：抵销比例与市场规则变化（应对：跟踪生态环境部方法学）；市场风险：碳价下跌触发补仓（应对：质押率保守+动态估值+补仓协议）；数据合规：碳资产数据涉资产安全（等保+专线）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "碳金融支点：上游连接碳管理系统（核算）与 EMC/光伏（产生减排量），下游连接碳市场交易与制造企业客户（盘活资产）；AI 把『未来的碳收益』变成『今天的质押物』，是绿色金融中轻资产、高杠杆的一环。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某电力企业以 2 万吨碳配额（市值约 1200 万元）质押，获得流动资金贷款 720 万元（质押率六成），约定碳价跌破阈值即补仓；同时碳资产在银行托管，履约与还款账户闭环管理。\n【自测题】碳价出现单边下跌时，银行为何要设置『补仓/平仓』机制？\n【参考要点】质押物随碳价贬值，若不止损，贷款可能高于质押物价值；补仓/平仓用于把风险敞口拉回安全线内。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选持有足额碳配额/CCER的控排企业。某电力企业持有约2万吨配额、市值约1200万，符合准入；核查权属与登记、有无重复质押，锁定为重点。\n2. 电话初步建联沟通：致电电企财务负责人，介绍碳配额质押可在不卖碳的前提下补充流动性，我行提供托管+融资+交易一站式服务，核实其融资需求，约看资产与登记材料。\n3. 现场初次拜访调研：核对企业配额台账与登记簿信息，了解其履约缺口与现金流节奏。企业担心影响履约与碳价波动，我留下碳质押方案，约定补充权属证明与交易记录。\n4. 全面尽职调查核验：核验配额权属、登记簿可质押性与历史交易；评估碳价波动与流动性，确定质押率约六成；设计盯市与补仓机制，确认处置通道可行，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『碳配额质押贷款』：额度720万、质押率约60%，期限1年以内，约定碳价跌破阈值即补仓；同步开立碳资产托管账户，履约与还款账户闭环。敲定核心条款。\n6. 授信报告撰写与申报：撰写授信报告，附权属与登记证明、碳价分析、盯市补仓与处置方案、托管协议，说明质押物权属清晰、可处置，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核查碳资产真实性与质押合规性。审查提示碳价波动致平仓、质押与履约冲突风险，要求盯市、补仓与处置安排。\n8. 授信审批与出具批复：审贷会关注碳价波动与处置难度。确认盯市补仓、托管闭环与短期期限后获批：额度720万，出具批复。\n9. 合同签署与担保落实：签订借款、碳配额质押与托管合同，办妥质押登记；明确补仓阈值、违约处置与回购安排，约定履约与还款账户闭环管理。\n10. 放款条件核验与贷款发放：核验质押登记生效、托管协议签署、账户闭环后，发放贷款，资金用于补充流动性。\n11. 贷后全流程管理：逐日盯市碳价与质押物市值，监控履约进度与还款账户；一次碳价下跌接近阈值，及时提示补仓，客户追加担保后风险回落，贷后报告如实记录。\n12. 到期结清与业务循环：贷款到期正常收回、质押解除。企业持续参与碳市场，我行延伸至碳交易结算、碳回购与远期，深化长期碳金融合作。"
+   }
+  ]
+ },
+ "票据/供应链/碳履约保函": {
+  "category": "金融服务",
+  "aiLink": "AI 贸易背景审核让票据与保函业务『真实可验』，把账期和保证金都变成融资工具。",
+  "attachments": [
+   {
+    "name": "供应链金融与票据产品手册.pdf",
+    "url": "./assets/bill-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "四流匹配核验操作规范.pdf",
+    "url": "./assets/bill-4flow.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "银行承兑汇票、供应链金融（应收/预付融资）与碳交易履约保函，是覆盖贸易背景与履约信用风险的流动性与增信工具。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『贸易数据智能核验+供应链可视化』：①AI 审单——自动解析合同、发票、物流单据，交叉验证交易真实性，识别虚假贸易与重复融资；②供应链图谱——AI 刻画『核心企业-供应商-客户』网络，动态核定链属企业额度；③现金流预测——账期与回款模型自动生成，票据贴现定价更精准；④保函替代保证金测算——AI 对比现金保证金占用成本与保函费用，输出最优担保方案。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：银行承兑汇票/国内信用证+贴现（绿票通享再贴现优惠）；供应链金融围绕核心企业应付账款放款；碳履约保函替代现金保证金。\n2. AI 审单要点：合同-发票-物流-回款四流匹配，异常自动标记；重复质押实时识别。\n3. 数据接入：企业 ERP/财务系统 API+发票查验平台+物流轨迹数据。\n4. 实施步骤：核心企业尽调→链属企业批量核额→四流数据接入→线上随借随还。\n5. 预期效果：审单时效从天级到分钟级；链属企业覆盖率提升 3~5 倍。\n6. 可执行颗粒度：核心企业 1 亿元应付款可撬动 6000~7000 万元链属融资；贴现利率较流贷低 30~80BP。\n7. 风控红线：严禁无真实贸易背景的票据与保函；见索即付保函条款须无歧义。\n【业务定义】银行承兑汇票（银承）是银行承诺到期付款的票据，帮付款方延期支付、帮收款方提前变现；供应链金融基于真实贸易为核心企业的上下游融资；碳履约保函则是银行向交易机构出具的履约担保，让企业以银行信用替代现金保证金参与碳市场。对初学者：票据要有真实贸易背景，保函核心是反担保与代偿风险。\n【信贷切入点】围绕核心制造企业（下游客户）的供应链提供票据与保理，能盘活上下游、绑定结算存款；碳履约保函帮企业释放被占用的保证金，银行赚取手续费并沉淀资金。这是零碳工厂生态里『轻资本、高粘性』的业务。\n【关键数据】6个月（票据期限（银承典型期限，最长一般 6 个月~1 年））；核心企业（授信依托（供应链金融的信用锚））；保证金替代（保函价值（用银行信用替代现金占用））\n【适用场景】有强信用核心企业背书的供应链（组件商、ESCO 等上下游）；需参与碳交易但现金紧张的履约方；希望降低保证金占用、提高资金使用效率的企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】票据贴现/绿票通+供应链金融+保函（替代保证金）；还款来源=贸易回款现金流；额度基于核心企业确权应付账款；利率享绿色票据再贴现优惠。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】绿色票据享再贴现额度与利率优惠；保函业务不占用现金保证金、间接享受补助资金监管政策红利；碳履约保函直接服务碳市场合规。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】贸易背景不真实（虚构合同开票，涉嫌融资性贸易）；核心企业信用风险传导；保函代偿（客户违约银行先赔）；重复融资与虚假应收账款。\n【新增风险与应对】执行风险：虚假贸易与重复融资（应对：四流交叉核验+黑名单+系统查重）；政策风险：票据监管新规（应对：跟踪票交所规则）；市场风险：核心企业信用传导（应对：集中度限额+动态调额）；数据合规：交易数据涉商业秘密（专线+脱敏+保密协议）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "贸易金融枢纽：上游连接制造企业客户（核心企业信用）与零碳项目采购（设备/工程款），下游服务链属供应商与农民工工资支付等场景；AI 四流核验是供应链金融规模化的前提，票据贴现现金流反哺项目还贷。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某零碳工厂核心企业为其上游光伏组件商开立 5000 万元银行承兑汇票，银行同步配套供应链保理（把组件商的应收账款提前变现），既盘活了供应商现金流，又把结算存款留在行内。\n【自测题】碳履约保函相比企业缴现金保证金履约，对银行和客户各自的价值是什么？\n【参考要点】客户释放了被占用的保证金（省资金成本），银行以信用替代现金、赚取手续费并沉淀结算资金，同时需管控代偿风险。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：梳理有强信用核心企业背书的供应链与需碳履约的客户。某零碳工厂核心企业信用良好、其上游组件商有融资需求；另有碳交易方需履约保函，均符合准入。\n2. 电话初步建联沟通：致电核心企业财务，介绍我行可为其上游开立银承并配套保理、盘活供应链；同时推介碳履约保函替代保证金。对方有需求，约看合同与结算安排。\n3. 现场初次拜访调研：核核心企业与组件商的采购合同、订单与结算方式，确认真实贸易背景；又了解碳交易方的保证金占用痛点。我留下票据、保理与保函方案，约定补充发票与物流单。\n4. 全面尽职调查核验：核验合同、发票、物流三单匹配，确认真实贸易与应收账款；核核心企业评级与担保能力；核验碳交易方资信与反担保措施，形成两套尽调意见。\n5. 定制化授信方案洽谈：为核心企业核定授信，为其上游组件商开立5000万银承并配套供应链保理；为碳交易方开立履约保函替代保证金。敲定额度、期限、费率与反担保安排。\n6. 授信报告撰写与申报：撰写授信报告（核心企业+供应链+保函），附贸易背景材料、核心企业评级、反担保与保函条款，说明风险可控、资金闭环，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查，重点核验贸易真实性与核心企业信用传导；绿色专项岗核验保函用于碳履约的合规性。审查提示融资性贸易与代偿风险，要求确权与回款监控。\n8. 授信审批与出具批复：审贷会关注贸易真实性与代偿风险。确认三单匹配、确权与反担保后，银承、保理与履约保函额度一并获批，出具批复。\n9. 合同签署与担保落实：签订银承、保理与保函合同，落实核心企业担保与反担保；确权应收账款，约定回款账户闭环；保函明确赔付条件与期限。\n10. 放款条件核验与贷款发放：核验贸易背景、确权登记与反担保后，开立银承、发放保理款项；保函按交易机构要求出函，同步落实保证金替代与收费。\n11. 贷后全流程管理：监控贸易连续性与回款到账，跟踪核心企业经营与担保有效性；关注保函项下赔付触发。定期更新贸易背景，防范重复融资，贷后报告如实反映。\n12. 到期结清与业务循环：银承到期兑付、保理收回、保函正常解责。核心企业扩大采购，我行放大供应链额度并延伸碳保函与结算服务，形成长期合作。"
+   }
+  ]
+ },
+ "保函业务（非融资性）": {
+  "category": "金融服务",
+  "aiLink": "AI 把保函的索赔条款、有效期与项目进度对齐，担保不越位、资金不白占。",
+  "attachments": [
+   {
+    "name": "非融资性保函产品手册.pdf",
+    "url": "./assets/guarantee-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "保函条款AI审查要点清单.pdf",
+    "url": "./assets/guarantee-terms-checklist.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "零碳工厂招投标、设备采购、工程履约处处要交保证金——保函以银行信用替代现金保证金，释放企业流动资金；投标、履约、预付款、质量全品种覆盖，见索即付、线上办理，把业务合作周期越拉越长。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『保函全生命周期智能管理』：①条款 AI 审查——扫描招标文件与保函格式条款，识别见索即付、金额敞口、到期日与减额条款风险点；②项目进度跟踪——AI 关联工程节点，提示保函到期续期、减额与撤销时点，避免额度长期闲置；③替代方案测算——对比现金保证金、质押存单与保函的综合成本，输出最优结构；④网银全流程——线上申请、资料上传、开立查询，AI 预填表单减少人工差错。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：投标/履约/预付款/质量/付款五类非融资性保函；网银端线上申请开立，资料线上上传。\n2. AI 条款审查要点：索赔条件、单据要求、到期日与顺延规则、减额机制、适用法律五要素逐项扫描。\n3. 数据接入：企业网银+项目管理系统+招标平台数据，保函到期前 30/15/7 天三级提醒。\n4. 实施步骤：交易背景调查（真实性/合法性/可行性）→分行资产监控部放款审查→业务营运部依《审查发放通知书》出具→贷后跟踪。\n5. 预期效果：保函开立时效 T+1；替代现金保证金释放流动资金 100%（如 400 万元投标保证金）。\n6. 可执行颗粒度：2 亿元标段履约保函通常按合同额 10% 开立（2000 万元），年费率约 0.5%~1.5%，成本远低于流贷。\n7. 风控红线：基础交易背景必须真实；担保公司客户须在地方金融监管平台名单内。\n【业务定义】国内非融资性保函指银行作为担保人，应申请人申请，在基础合同或交易项下向受益人出具书面或电子承诺：当被担保人未按合同约定履行义务时，由银行按约定履行债务或承担责任。常见品种：投标保函、履约保函、预付款保函、付款保函、质量保函。与融资性保函（担保借款、发债）不同，它担保的是『履约行为』而非『还钱』。\n【信贷切入点】信贷切入点在于『交易真实、品种匹配、成本更优』。经营机构先落实交易背景真实性、合法性、可行性调查，重点核实基础合同；对生产经营正常、无重大不良征信记录的客群，按招投标/采购/运维阶段匹配品种；以保函替代现金保证金，综合成本远低于流动资金贷款。\n【关键数据】5类（常见品种覆盖（投标/履约/预付款/付款/质量））；替代现金（以银行信用替代保证金、质押存款，减少资金占用）；线上化（网银申请、上传、开立、查询全流程线上办理）\n【适用场景】工程承包：承包商参与招投标、签订施工合同后向业主开函，替代现金保证金；货物购销：供应商中标大额采购后向买方开履约/质量保函，证明履约能力；服务贸易：服务商承接运维、咨询等服务合同后开质量保函，保障交付时效；零碳工厂设备采购与工程建设的各阶段担保需求"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】保函替代现金保证金——释放流动资金；开立需落实授信条件（可占用固贷/流贷额度或反担保）；见索即付条款下银行先行赔付再追偿，故条款严谨性是风控核心；可叠加碳履约保函服务碳市场。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】保函本身不直接产生补贴，但替代的保证金若为补助资金，可进入监管账户合规使用；工程建设项目享受福州/厦门节能改造补助的，保函覆盖的履约环节与补助绩效目标联动。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】基础交易背景不真实（假招标、空合同）引发合规风险；见索即付项下受益人不当索赔，银行被动赔付；客户履约失败导致银行垫款后追偿；担保公司客户未列入地方金融监管平台名单。\n【新增风险与应对】执行风险：受益人不当索赔（应对：条款无歧义+留存备查+及时响应）；合规风险：虚假招标与空合同（应对：招标书/中标通知书/合同三证核验）；政策风险：保函监管口径变化（应对：跟踪总局与分行制度）；市场风险：客户履约失败导致垫款（应对：授信准入+反担保+追偿机制）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "信用担保枢纽：上游连接招投标市场与设备/工程采购（零碳工厂建设期），下游服务 EPC 总包、设备商与运营商；保函释放的现金流直接进入项目周转，与固贷、票据形成企业信用工具组合。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某零碳工厂EPC总承包方中标2亿标段，业主要求缴纳现金履约保证金。我行开立履约保函替代现金：企业零资金占用、综合成本远低于流贷；保函覆盖预付款、质保、运维全流程，项目结束合作延续，银行后续跟进其代发与结算业务。\n【自测题】非融资性保函与融资性保函的根本区别是什么？\n【参考要点】非融资性保函担保的是基础交易中的『履约行为』（投标、履约、付款、质量），不涉及借款还本付息；融资性保函（借款保函、债券发行保函）才是为融资还钱做的担保——两者审查重点与风险敞口完全不同。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：从工程承包客群中筛选保函需求：某总承包方刚中标零碳工厂2亿标段、业主要求现金保证金；另一承包商近期涉诉较多，先剔除。锁定经营正常、征信良好的总包单位。\n2. 电话初步建联沟通：致电周总，得知业主要求的现金履约保证金约400万、占用资金大。我介绍以保函替代现金保证金、网银线上办理，约看中标文件与合同条款。\n3. 现场初次拜访调研：看中标通知书与施工合同，确认受益人要求的保函品种（履约+预付款）与格式条款。周总关心赔付风险，我解释见索即付的含义与条款边界，留下资料清单。\n4. 全面尽职调查核验：核验交易背景真实性（招标书、中标通知书、基础合同）、企业经营与征信；评估受益人资质与索赔条款，形成保函调查报告。\n5. 定制化授信方案洽谈：匹配非融资性保函组合：履约保函+预付款保函替代现金保证金，网银线上申请开立；周总算了一笔账，资金占用成本大降，当即敲定。\n6. 授信报告撰写与申报：撰写报告附交易背景材料、保函协议草案与受益人审查意见，按流程提交分行资产监控部。\n7. 风险审查与绿色专项审核：风控核查交易背景真实与索赔条款严谨性；审查提示见索即付项下不当索赔风险，要求条款表述无歧义、留痕完整。\n8. 授信审批与出具批复：审贷会关注背景真实与受益人信用。确认后出具放款审查意见，核定保函额度与品种。\n9. 合同签署与担保落实：签订开立保函协议、申请书，落实授信条件；约定保函撤销条件与减额机制，避免额度长期占用。\n10. 放款条件核验与保函开立：经营机构落实背景核实后，分行资产监控部审查通过，业务营运部依据《审查发放通知书》对外出具保函，网银端可查。\n11. 贷后全流程管理：跟踪项目履约进度与保函有效期，到期及时撤销释放额度；一次受益人询证当日响应，未影响施工节奏。\n12. 到期结清与业务循环：项目竣工结算、保函如期撤销。企业年中标新标段，我行循环开函，并带动其代发工资与结算业务。"
+   }
+  ]
+ },
+ "代发业务": {
+  "category": "金融服务",
+  "aiLink": "AI 让代发从『发工资』升级为『用工合规数据入口』，绑定企业的民生现金流。",
+  "attachments": [
+   {
+    "name": "代发业务产品手册.pdf",
+    "url": "./assets/payroll-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "农民工工资专户监管对接指引.pdf",
+    "url": "./assets/payroll-account-guide.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "零碳工厂施工或运营阶段大规模用工，薪资发放是合规硬约束——代发业务支持农民工工资专户代发、系统连接政府监管端口，资金定向划转、发放记录实时上传；签约线上化、模式多样，是黏住对公客户的『民生入口』。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『薪酬数据的智能化与合规化』：①AI 工资单解析——自动校验花名册、考勤、社保与个税数据一致性，异常自动标记；②智能工资单——个性化模板+手机下发，替代纸质签收；③失败智能补发——一键定位失败账户、批量重发；④专户监管对接——农民工工资专户发放记录实时上传政府监管端口，AI 自动核对『专户、实名、总包代发』三要素。零碳工厂施工期用工规模大，代发是银行切入客户的最低门槛、最高频业务。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：标准/集团/密薪/多岗位灵活/数字人民币/专户/农民工工资代发七种模式；企业网银线上签约、维护、解约。\n2. AI 合规校验：考勤-工资-个税-社保四单匹配，欠薪风险提前预警；发放记录实时上传监管端口。\n3. 数据接入：企业 HR/考勤系统 API+政府监管平台；支持 7×24 小时实时/预约/无卡代发。\n4. 实施步骤：账户开立与状态核验→代发协议签署→专户开立与监管联调→首笔试跑→全量发放→按月对账。\n5. 预期效果：发放时效从天级到实时；人工差错率下降 90%；满足住建领域农民工工资支付监管硬约束。\n6. 可执行颗粒度：1200 人工地代发，月代发额约 600~900 万元，按资金沉淀与结算收益测算综合贡献。\n7. 风险红线：专户资金不得混用；劳务费与工资分账核算；失败当日处理。\n【业务定义】代发业务指银行与对公客户签订委托代发协议，按国家政策法规批量向个人发放工资类或非工资类款项的业务。目前已实现标准代发、集团代发、密薪代发、多岗位灵活代发、数字人民币代发、专户代发、农民工工资代发等多种模式，覆盖薪酬（工资、加班费、奖金、绩效）与非薪酬（劳务费、报销）全品目。\n【信贷切入点】信贷切入点在于『账户先行、场景匹配、监管对接』。客户在我行开立结算账户且状态正常；按客户形态匹配模式——集团客户优先集团代发，工程建设类推荐普通代发+农民工工资专户代发，有人力制单、财务发薪特殊要求的推荐人力代发；专户连接政府监管端口，发放记录实时上传，满足用工合规。\n【关键数据】1万+户（服务代发客户规模（多种模式覆盖））；7×24小时（实时代发、预约代发、无卡代发支持）；专户监管（农民工工资专户对接政府监管端口、记录实时上传）\n【适用场景】零碳工厂施工阶段：农民工工资专户代发，满足用工合规与监管报送；零碳工厂运营阶段：正式员工标准代发、奖金绩效发放；集团客户：多级架构下的集团代发与密薪代发；人力资源公司、工程建设项目、大型企事业单位的代发需求"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】代发本身是结算类业务，收益来自资金沉淀与结算；其金融价值在于：①代发流水作为经营佐证提升授信评分；②以代发账户为核心开立保函、票据、流贷等一揽子合作；③农民工专户资金受监管但沉淀稳定，可支撑流动性测算。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】农民工工资专户代发直接满足《保障农民工工资支付条例》专户管理、总包代发、实名制、工资保证金等要求，帮助企业免于行政处罚；数字化代发投入适用数智化改造相关政策口径。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】专户资金混用、发放记录未实时上传引发监管处罚；代发失败处理不及时影响工人情绪与企业声誉；账户状态异常导致代发中断；劳务费与工资混同核算的合规瑕疵。\n【新增风险与应对】执行风险：发放失败影响工人情绪与企业声誉（应对：失败一键补发+当日响应机制）；合规风险：专户资金混用、记录未实时上传（应对：专户专用+系统直连+留痕）；政策风险：劳动与工资支付监管趋严（应对：跟踪条例与地方细则）；数据合规：员工个人信息敏感（应对：加密传输+最小授权+个保法合规评估）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "民生金融入口：上游连接总包单位与用工企业（零碳工厂施工/运营期），下游连接农民工个人账户与政府监管系统；代发带来的结算存款、流水与账户数据是银行切入企业全量业务的入口，与固贷、保函形成『对公+零售』组合。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某零碳工厂建设期用工1200余人，我行开立农民工工资专户：总包通过企业网银线上发起，资金定向划转至工人个人账户，发放记录实时上传政府监管端口；运营期转为标准代发，联动智能工资单下发至员工手机，工厂用工合规一次落地、银行结算存款双沉淀。\n【自测题】为什么工程建设类客户推荐『农民工工资专户代发』模式？\n【参考要点】工程建设领域农民工工资支付有专门监管要求：专户管理、总包代发、实名制、实时上传监管系统。专户代发对接政府监管端口、发放记录留痕，既满足合规硬约束，又帮企业规避欠薪纠纷与行政处罚。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：从工程结算客群筛选代发需求：某零碳工厂总包单位用工1200余人、工资发放分散；核查其在我行结算账户状态正常，锁定为代发重点。\n2. 电话初步建联沟通：致电郑总，得知工资由班组转发、常被投诉到账慢，政府又要求专户监管。我介绍农民工工资专户代发，对接监管端口、记录实时上传，约看用工合同。\n3. 现场初次拜访调研：看花名册、劳动合同与总包代发协议，核对开户信息。郑总担心系统对接麻烦，我演示企业网银线上签约与批量导入，留下资料清单。\n4. 全面尽职调查核验：核验账户状态、代发需求真实性与用工合规安排；确认匹配农民工专户+普通代发组合，形成合作方案。\n5. 定制化授信方案洽谈：定制代发方案：专户对接政府监管端口、网银线上签约、失败一键补发、7×24小时到账；郑总关心时效，演示预约代发与回单下载。\n6. 授信报告撰写与申报：撰写报告附账户资料、代发协议与监管对接方案，说明专户专用、记录留痕，提交审批。\n7. 风险审查与绿色专项审核：风控核查账户与资金用途；审查提示专户资金混用风险，要求专户专用、发放记录实时上传、失败及时处理。\n8. 授信审批与出具批复：审贷会关注专户合规与系统对接可靠性。确认后批复代发合作方案，核定专户与代发权限。\n9. 合同签署与担保落实：签订委托代发协议，开通企业网银代发权限，完成专户开立与监管端口联调。\n10. 放款条件核验与代发上线：核验专户开立、名单导入与端口联调后，首笔代发小批量试跑成功，次日全量发放。\n11. 贷后全流程管理：按月监测代发批次、到账时效与失败补发；一次名单错误当日更正，未影响发放；记录实时上传获监管认可。\n12. 到期结清与业务循环：项目竣工、用工转移；企业运营期转为标准代发+智能工资单，我行以代发为入口联动结算与授信，合作延续。"
+   }
+  ]
+ },
+ "制造企业客户/碳减排主体": {
+  "category": "下游",
+  "aiLink": "制造企业是 AI 节能的需求总入口：节能降本、绿色标签、碳合规三件事一起解决。",
+  "attachments": [
+   {
+    "name": "零碳工厂整体解决方案建议书.pdf",
+    "url": "./assets/mfg-solution.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "绿色工厂梯度申报指南.pdf",
+    "url": "./assets/mfg-green-factory.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "实施零碳改造的制造企业本身是信贷承载主体（借款人），其信用、经营状况与减排成效共同决定融资条件与定价。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『企业级能源系统优化』：①AI 负荷预测与生产排程联动——把高耗能工序排到低谷电价时段，直接降低用电成本；②公辅车间 AI 群控（空压/制冷/空压）——挤出系统冗余；③绿电配置优化——AI 模拟光伏+储能+购电的最优组合，使绿电占比与用电成本同时最优；④碳合规——AI 碳核算应对 CBAM 与供应链碳披露要求。对企业而言，这不是单点节能，而是『成本下降+标签提升+合规兜底』的组合价值。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 整体方案：先做能源审计+AI 仿真（2~4 周），输出『公辅群控+绿电配置+排程优化』三件套与 3 年节能路线图。\n2. 硬件清单：物联网关、传感器、储能柜（按需）、光伏组件（按屋顶条件）；软件：AI 能控平台+能碳管理中心。\n3. 数据接入：EMS/MES/ERP 三系统打通，15 分钟级能耗数据与工单关联。\n4. 实施步骤：诊断→分项改造（公辅优先）→系统联调→持续寻优→认证申报（绿色工厂/零碳工厂）。\n5. 预期效果：综合用能成本下降 15%~30%；3 年内完成绿色制造梯度认定。\n6. 可执行颗粒度：年用电 2000 万 kWh 的工厂，综合节能 20% 即年省约 280 万元，改造投资回收期 2~3 年。\n7. 政策叠加：节能补助+税收抵免+绿色标签+融资优惠四重红利同时吃满。\n【业务定义】下游客户即银行对公信贷的『借款人』。当企业取得绿色工厂、零碳工厂等认证，或产品碳足迹显著下降，其绿色属性可提升信用评级、获取绿色信贷优惠，甚至触发 ESG（环境、社会、治理）挂钩贷款的利率优惠。对初学者：授信先看还款能力（经营现金流），绿色标签是加分项，不是替代项。\n【信贷切入点】银行应在常规对公尽调基础上叠加『绿色属性认定』，并将减排成效纳入贷后跟踪，形成 ESG 挂钩贷款（达成减排 KPI 利率下浮、未达成回调）的基础，实现环境效益与风险定价联动。\n【关键数据】信用评级（核心授信依据（还款能力与意愿是第一位的））；绿色制造（增信标签（绿色工厂/零碳工厂认证））\n【适用场景】有真实减排意愿与技改计划的制造型企业；出口需满足碳足迹/CBAM（欧盟碳边境调节机制）要求的制造商；希望以绿色属性换取更低融资成本的客户"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】综合授信：流贷+固贷+票据+保函+代发一揽子；第一还款来源=经营现金流；担保=房产抵押+设备抵押+收益权质押；绿色标签企业可享利率优惠与额度倾斜；AI 能效数据辅助授信评分。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】绿色工厂国家级福州再奖 20 万元、厦门最高 50 万元；低零碳工厂福州省级配套 50%/厦门 20 万~50 万元；节能改造 500 元/吨标煤补助；数智化改造 10% 抵免；高企 15%+研发加计（有自研）。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】经营波动直接影响还款（第一还款来源）；减排成效不达预期致绿色标签失效、优惠回调；认证与披露的公信力风险（被质疑漂绿）；ESG 指标设定不科学引发争议。\n【新增风险与应对】执行风险：多系统集成失败（应对：分项实施+双轨运行）；政策风险：认定标准提升（应对：按最新评价细则设计）；市场风险：产品需求波动影响现金流（应对：订单锁定+敏感性）；数据合规：生产与用能数据涉核心工艺秘密（等保+本地化+保密协议）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "需求中枢：制造企业上游采购 EPC/光伏/储能/软件服务，中游用 EMS/监测/碳管理落地，下游产出绿色产品与碳减排量（绿证/CCER）；金融端以综合收益权+固定资产+碳资产组合授信，是整张图谱商业闭环的『出题人』。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某装备制造企业因获『绿色工厂』认证，与银行签订 ESG 挂钩贷款：设定年度减排 KPI，达标则利率自动下浮 30BP（基点），未达标则回调。激励与约束并存，企业降碳积极性显著提升。\n【自测题】ESG 挂钩贷款中，若企业未达成减排 KPI，银行通常如何调整条款？\n【参考要点】通常按约定上调利率或收回优惠，也可能要求追加担保/缩短期限，具体以合同约定为准。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选项真实减排意愿与技改计划的制造企业，尤其有出口碳足迹需求的。某装备制造企业拟申报绿色工厂、有出口业务，符合准入；核查其减排KPI可量化性，锁定为重点。\n2. 电话初步建联沟通：致电企业战略部，介绍我行ESG挂钩贷款：达成减排KPI可享利率下浮，且绿色工厂认证可增信，核实其技改与认证计划，约看企业与项目。\n3. 现场初次拜访调研：看主要产线能耗与减排举措，了解其绿色工厂申报进度与出口碳足迹要求。企业关心利率优惠如何落地，我留下ESG挂钩贷款方案，约定明确KPI与数据口径。\n4. 全面尽职调查核验：常规对公尽调核验经营与财务；叠加绿色属性认定，核查认证进展、历史能耗与减排数据；确认减排KPI可量化、可验证，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『ESG挂钩贷款』：设定年度减排KPI，达标利率下浮30BP、未达标回调；按技改匹配项目贷与流贷组合。企业认可激励约束，敲定KPI与利率调整条款。\n6. 授信报告撰写与申报：撰写授信报告，附财务与经营分析、绿色属性认定、减排KPI与验证方案、ESG挂钩条款，说明第一还款来源为经营现金流、绿色属性为增信，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核查绿色属性真实性与KPI可验证性，防范漂绿。审查提示经营波动与KPI不达致优惠回调，要求KPI口径与验证方法明确。\n8. 授信审批与出具批复：审贷会关注还款能力与KPI科学性。确认以经营现金流为第一还款来源、KPI可验证后，批复项目贷与ESG挂钩流贷，出具正式批复。\n9. 合同签署与担保落实：签订借款合同与ESG挂钩条款（利率调整机制），落实担保；明确KPI口径、验证机构与调整时点，认证与披露义务写入合同。\n10. 放款条件核验与贷款发放：核验放款前提、担保登记与KPI基线后，发放贷款，资金用于技改与流动资金。\n11. 贷后全流程管理：按季跟踪减排KPI达成、认证进展与经营现金流；年度核验KPI并执行利率调整。一年减排达标，按约下浮利率，贷后报告记录成效与定价联动。\n12. 到期结清与业务循环：贷款结清、企业获绿色工厂认证。扩产再启合作，我行以更优ESG挂钩条件续做，并延伸供应链与结算，形成长期伙伴关系。"
+   }
+  ]
+ },
+ "节能收益/绿证交易": {
+  "category": "下游",
+  "aiLink": "AI 把每一度绿电的环境价值算清楚、卖出去，让绿电多一份收入。",
+  "attachments": [
+   {
+    "name": "绿证交易操作指引.pdf",
+    "url": "./assets/gec-trading-guide.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "绿电消费凭证申请模板.pdf",
+    "url": "./assets/gec-certificate.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "节能节电费与绿证（GEC）出售，是把节能成果与绿电环境价值变现的收益来源，构成项目现金流与额外收益。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『绿电溯源与收益最大化』：①AI 绿电追踪——按组件级/逆变器级发电数据自动生成绿电消费凭证，证明『用了多少绿电』；②收益优化——对比自用节省、上网电价与绿证售价，AI 推荐最优消纳策略；③凭证管理——自动匹配绿证核发（每 1000 度绿电一张）与交易窗口，减少环境价值漏损；④碳减排量同步折算，衔接 CCER 开发。厦门政策：按企业结算绿电量给予每度电 0.01 元奖励、每家每年不超过 50 万元。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：绿电直供/自发自用+绿证认购/交易；AI 平台自动生成绿电消费凭证与核发申请。\n2. AI 测算要点：分时发电量-用电负荷匹配模型，输出绿电自用率与余电处置策略。\n3. 数据接入：电站发电数据（逆变器级）+企业用电数据（关口表级），双源比对防虚报。\n4. 实施步骤：绿电凭证备案→交易开户→挂牌/协商交易→奖励申报（厦门 0.01 元/度）。\n5. 预期效果：绿电环境价值变现 0.01~0.05 元/度；出口型企业获得 RE100/绿电消费声明。\n6. 可执行颗粒度：年用绿电 500 万 kWh 企业，卖证+奖励合计年增收约 5~25 万元。\n7. 风控要点：绿证与电量一一对应，严禁一电多卖；数据留痕备查。\n【业务定义】节能收益=改造后少交的电费/燃气费；绿证（GEC，Green Electricity Certificate）是可交易的环境权益凭证，每 1000 度绿电核发 1 张，卖给需要绿色电力证明的企业（如出口商、有 ESG 披露需求的上市公司）。对初学者：绿证是『环境价值的钱』，与卖电的『能量的钱』分开。\n【信贷切入点】银行可将绿证与节能收益作为补充还款来源纳入现金流测算并做价格敏感性；亦可为绿证交易提供结算、托管服务，绑定中间业务。收益越稳定可预测，增信效果越好。\n【关键数据】10~30元/张（绿证价格（每张对应 1000 度绿电，示例区间））；1张/1000kWh（核发比例（每兆瓦时绿电核发一张绿证））\n【适用场景】自发电量可观、绿证可出售的绿电项目；需要增厚现金流、优化偿债覆盖的融资主体；有绿电资产并希望盘活环境价值的企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】绿证/绿电交易收益可作为项目现金流的补充还款来源（审慎计入）；绿电消费凭证提升企业 ESG 评级，间接降低融资成本；可用未来绿电收益权做小额质押。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】厦门绿电绿证奖励 0.01 元/度（≤50 万元/年）；国家鼓励可再生能源消费责任权重与绿证全覆盖；参与绿电交易可获地方绿色制造加分。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】绿证供过于求导致价格下行；有效期与跨省交易规则限制（过期作废、跨省难交易）；绿证与绿电合同绑定不清导致重复获益；价格波动影响收益稳定性。\n【新增风险与应对】执行风险：一电多卖与凭证造假（应对：双源数据+平台留痕）；政策风险：绿证制度与补贴退坡（应对：跟踪核发规则）；市场风险：绿证价格波动（应对：多批次出售+套保）；数据合规：发电与用电数据涉资产权益（专线+审计）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "环境价值出口：上游连接光伏/风电（绿电生产）与 EMS（消纳优化），下游连接用能企业客户（购绿电）与碳市场（CCER）；AI 把『绿色身份』变成可交易资产，是零碳工厂收益模型的最后一环。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某风电场年发电 1 亿度，对应约 10 万张绿证，按均价 18 元/张年增收约 180 万元。银行将其约 70% 计入项目还款来源，并做了绿证价格腰斩情景的压力测试，确保 DSCR 仍在安全线以上。\n【自测题】绿证『供过于求、价格下行』会如何影响以绿证收入为还款来源项目的 DSCR？\n【参考要点】绿证收入减少会降低分母（可用于还本付息的现金流），DSCR 下降；若占比过高，可能跌破审慎阈值，需压缩贷款成数或缩短期限。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选自发电量可观、绿证可出售的绿电项目。某风电场年发电约1亿度、对应约10万张绿证，符合准入；核查绿证权属与可交易性，锁定为重点。\n2. 电话初步建联沟通：致电风电场负责人，介绍我行可将绿证收入作为项目还款来源之一并配套质押融资，还可提供结算托管，核实其融资需求与绿证出售计划，约看项目。\n3. 现场初次拜访调研：看风场运营、上网结算与绿证核发情况，了解绿证交易渠道与价格。场方关心价格波动，我留下方案，约定补充发电数据与交易记录。\n4. 全面尽职调查核验：核验发电量历史、绿证核发与权属、可交易量与历史成交价；测算绿证收入约180万/年并做价格敏感性；确认收益可入账、可质押，形成尽调意见。\n5. 定制化授信方案洽谈：匹配『绿色项目贷＋收益权质押』：将约70%绿证收入计入还款来源，并做绿证价格腰斩压力测试；约定绿证收益账户回行。敲定额度、期限与归集安排。\n6. 授信报告撰写与申报：撰写授信报告，附发电与绿证数据、收益与敏感性测算、质押与归集方案，说明绿证收入稳定可测、价格风险已压力测试，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验绿证权属与防止环境权益重复获益。审查提示绿证价格下行与交易规则限制，要求审慎计入并设价格保护。\n8. 授信审批与出具批复：审贷会关注绿证价格波动。确认审慎计入比例、压力测试与收益归集后，批复项目贷并接受收益权质押，出具正式批复。\n9. 合同签署与担保落实：签订借款与绿证/电费收益权质押合同，办妥登记；约定绿证收益账户回行归集，交易与结算规则写入合同附件。\n10. 放款条件核验与贷款发放：核验质押登记、收益账户开立与首期绿证核发后，受托支付发放贷款，资金用于项目。\n11. 贷后全流程管理：按月监测发电量、绿证核发与交易回款，跟踪价格走势；一次绿证价格下行，启动敏感性复核并评估DSCR影响，贷后报告如实反映。\n12. 到期结清与业务循环：贷款结清、绿证收益稳定兑现。企业扩装机并参与更多绿电交易，我行延伸至绿证托管与碳资产服务，深化合作。"
+   }
+  ]
+ },
+ "碳配额与CCER": {
+  "category": "下游",
+  "aiLink": "AI 让减排量的开发、核证与交易节奏自动对齐，碳资产不错过最佳卖出窗口。",
+  "attachments": [
+   {
+    "name": "CCER项目开发操作指引.pdf",
+    "url": "./assets/ccer-development.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "碳价预测模型说明.pdf",
+    "url": "./assets/ccer-pricing.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "碳配额（CEA）与企业自主开发/采购的 CCER，是用于履约抵销与资产运作的两类碳资产，构成碳金融的底层标的。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『减排量的识别与运营』：①AI 项目筛选——自动比对方法学（并网光热、并网风电、碳汇造林等），评估 CCER 可开发量与额外性；②核证辅助——按监测计划自动汇总数据、生成报告初稿，缩短核证周期；③交易择时——价格预测+政策事件追踪，给出持有/分批卖出建议；④抵销管理——自动测算控排企业 5% 抵销额度内的最优组合。全国碳市场 CCER 重启后，方法学陆续扩容，AI 筛选大幅降低开发门槛。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：CCER 项目开发（设计文件+监测+核证+签发）→备案登记→交易（挂牌/大宗）→控排企业抵销。\n2. AI 筛选要点：额外性论证、基准线情景、监测参数可得性三要素打分，优先选数据现成的项目。\n3. 数据接入：方法学库+监测数据平台+交易行情；签发进度自动跟踪。\n4. 实施步骤：项目筛选（1~2 个月）→PDD 编制→第三方核证→签发→交易策略执行。\n5. 预期效果：开发周期缩短 30%；卖出时点优化提升收益 5%~15%。\n6. 可执行颗粒度：10 万千瓦时级光伏项目年减排约 8 万吨 CO₂e，按 60~100 元/吨测算年碳收益 480~800 万元（以实际签发与方法学为准）。\n7. 合规红线：严禁重复计算与虚报；抵销比例≤5% 硬约束内置模型。\n【业务定义】碳配额（CEA）是碳市场免费或有偿分配给控排企业的『排放许可证』，不够用要买、用不完可卖；CCER（国家核证自愿减排量）来自可再生能源等项目，经核证后可用来抵销最多 5% 的配额清缴。对初学者：配额是『门票』，CCER 是『抵销券』，二者共同构成企业可运作的碳资产。\n【信贷切入点】配额与 CCER 可在银行碳金融平台托管、交易、质押，形成『碳—资—信』闭环。银行提供一站式碳服务，把碳资产转化为授信筹码，既解决企业履约与流动性，又提升客户粘性与综合收益。\n【关键数据】5%（配额履约抵销上限（CCER 最多抵销应清缴量的 5%））；50~100元/吨（CCER 价格（每吨自愿减排量的价格，示例区间））\n【适用场景】控排企业的履约与碳资产运作（缺配额买、多配额卖/押）；CCER 项目业主（可再生能源、甲烷利用等）；希望统一管理集团碳资产的控股公司"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】CCER 可作为质押物（与配额同池管理）；预期碳收益可纳入项目现金流审慎测算（一般按 50% 折算）；亦可做碳回购与结构化产品；还款来源=碳资产处置+基础项目收益。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】厦门对域内核证 CCER 按出售量每千吨 CO₂e 奖励 1 万元（≤20 万元/年）；国家碳市场抵销机制支持；高企与研发优惠适用方法学开发企业。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】配额趋紧推高履约成本；CCER 方法学收紧影响供给与开发；碳价波动影响质押物价值；抵销比例政策变动。\n【新增风险与应对】执行风险：方法学不适配导致无法签发（应对：开发前方法学预沟通）；政策风险：抵销比例与市场规则调整（应对：跟踪生态环境部公告）；市场风险：碳价波动（应对：分批出售+持有策略）；数据合规：监测数据是核证生命线（原始留存+第三方审计）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "碳资产出口：上游连接碳管理系统（核算）与光伏/风电/EMC（产生减排量），下游连接控排企业（抵销需求）与碳金融市场（质押）；AI 运营让碳资产从『账面数字』变成『择时变现的收入流』。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某集团将旗下 5 家工厂的碳配额统一在银行碳平台托管，集中履约＋质押融资，集团授信额度因此提升 2 亿元，同时获得更优的碳交易结算服务与价格。\n【自测题】CCER『5% 抵销上限』对控排企业意味着其履约策略必须如何搭配？\n【参考要点】意味着绝大部分排放仍需用配额履约，CCER 只是补充；企业需以配额为主、CCER 为辅，并管理好二者的价差与来源。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：筛选有多家控排子公司、可统一运作碳资产的控股集团。某集团旗下5家工厂均有配额，符合准入；核查权属与分散管理问题，锁定为集团碳资产统一运作方案。\n2. 电话初步建联沟通：致电集团财务总监，介绍我行可提供碳资产统一托管、集中履约+质押融资，提升集团授信与资金效率，核实其授意与融资需求，约看各厂台账。\n3. 现场初次拜访调研：走访5家工厂，看各自配额持有、履约缺口与管理方式，发现各自为政、额度分散。我留下集团碳托管+融资方案，约定汇总台账与权属证明。\n4. 全面尽职调查核验：核验5家工厂配额权属、登记信息与履约缺口，评估集团整体信用与现金流；确认集中托管+质押可行，测算可提升集团授信约2亿，形成尽调意见。\n5. 定制化授信方案洽谈：匹配『碳托管＋碳质押＋交易结算』一揽子方案：统一托管、集中履约，以组合碳资产质押提升集团授信；约定盯市与处置。集团认可，敲定框架条款。\n6. 授信报告撰写与申报：撰写集团授信报告，附5厂台账、权属证明、托管与质押方案、授信提升测算，说明权属清晰、集中运作降本增效，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验碳资产真实性与抵销比例合规（CCER最多抵销5%）。审查提示碳价波动与履约冲突，要求盯市与履约保障。\n8. 授信审批与出具批复：审贷会关注集团信用与碳价波动。确认托管、盯市与履约安排后，批复集团授信提升约2亿并接受碳资产质押，出具正式批复。\n9. 合同签署与担保落实：签订集团框架协议、碳托管与质押合同，办妥登记；明确5厂履约与还款账户闭环、盯市补仓与处置安排。\n10. 放款条件核验与贷款发放：核验托管协议、质押登记与账户闭环后，按集团用款计划发放贷款并受托支付，资金高效调配至各厂。\n11. 贷后全流程管理：统一监测集团碳资产市值与履约进度，盯市碳价、监控各厂现金流；每季评估授信使用与质押充足率，触发阈值提示补仓，出具集团贷后报告。\n12. 到期结清与业务循环：贷款结清、集团碳运作成熟。集团扩大托管范围并开发CCER，我行延伸至碳交易结算与绿色贷款，形成长期碳金融伙伴关系。"
+   }
+  ]
+ },
+ "数据真实/碳核算合规": {
+  "category": "风险",
+  "aiLink": "AI 节能的前提是数据可信，数据造假一次就烧掉整个商业模式。",
+  "attachments": [
+   {
+    "name": "数据质量校验操作规范.pdf",
+    "url": "./assets/data-quality.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "碳数据MRV留痕清单.pdf",
+    "url": "./assets/data-mrv.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "能耗与碳排放数据的真实性、完整性、可追溯性，是绿色金融的『生命线』，也是监管与银行风控的第一道防线。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『数据质量即风控质量』：①AI 数据校验——对计量数据做连续性、合理性与交叉验证（电表-发票-产量-能耗四源比对），自动标记异常与造假模式；②碳数据质量——范围一/二边界、排放因子版本、活动水平数据三要素审计留痕；③隐私合规——负荷数据涉生产工艺秘密、薪酬数据涉个人信息，须分级授权与脱敏；④安全防护——工控系统按电力监控系统安全防护规定分区防护，平台过等保三级。对银行，数据真实性是收益权质押的第一还款来源是否成立的前提。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 数据质量三查：查连续性（无断档）、查合理性（峰谷规律/季节性）、查交叉一致性（多源比对），AI 自动出具质量评分。\n2. 碳核算留痕：排放因子库版本管理、核算底稿自动归档、支持第三方核查一键导出。\n3. 隐私合规：生产数据脱敏、个人信息最小必要、薪酬数据加密传输；签署数据保密协议。\n4. 安全防护：平台等保三级、工控系统分区分域、数据出境安全评估（如有海外云）。\n5. 实施步骤：数据治理制度→AI 校验上线→第三方数据质量审计→持续监测。\n6. 预期效果：数据可信度评分≥90 分，满足补助申报、碳核查与银行贷后三重场景。\n7. 可执行颗粒度：按季度出具数据质量报告，异常数据 T+1 冻结并人工复核。\n【业务定义】绿色信贷和碳金融都建立在『数据真实』之上：节能收益、发电量、碳排放量都要可核验。核算不合规（边界不清、方法学用错、数据来源不可靠）会导致数据失真，进而引发监管处罚、绿色属性失效、碳资产无法质押等一系列风险。对初学者：没有可信数据，就没有可信的绿色金融。\n【信贷切入点】银行应把『数据真实性』作为授信前置条件与贷后监测重点，借助物联网直采（替代手工报表）与第三方核证降低信息不对称，并把异常波动纳入预警模型，做到早发现、早处置。\n【关键数据】不可篡改（数据要求（直连采集、留痕可追溯））；第三方核证（增信手段（独立机构背书数据可信度））\n【适用场景】所有绿色信贷与碳金融业务的前置条件；涉及节能收益、发电量、碳排放量的授信项目；接受监管核查与信息披露的场景"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】数据真实性是授信前提：银行凭在线监测数据做收益权质押贷后监管；发现数据造假即触发提前收回贷款与担保追索；补助资金监管账户与数据直连防骗补。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】补助申报要求数据可核证（福州按预估节能量预拨 50% 后按实际节能量清算）；碳核查要求 MRV 数据质量；税务 10% 抵免要求改造投入单独核算、支出划分不清不得享受。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】手工填报或人为篡改数据；核算边界与方法学错误导致结果失效；数据孤岛、口径不一致；数据安全与隐私合规风险。\n【新增风险与应对】执行风险：计量器具未检定、数据断档（应对：强制检定+双路冗余+质量评分）；政策风险：监管核查口径变化（应对：预沟通+留痕）；市场风险：数据造假引发声誉与法律风险（应对：零容忍+制度+审计）；数据合规：个保法/数安法/电力监控安全防护三线合规。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "风险底座：连接所有节点——任何节点的节能量、发电量、减排量最终都要汇聚为数据被采信；数据真实一旦失守，EPC 分成、补助申报、收益权质押、碳交易全部失效，是图谱中『一票否决』型节点。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】监管通报某企业通过虚报能耗数据获取绿色贷款，银行据此把『数据真实性』升级为绿色信贷一票否决项：凡发现数据造假，无论项目多优质一律退出，并追责到客户经理。\n【自测题】若没有『第三方核证』，银行仅凭企业自报数据授信会暴露哪类风险？\n【参考要点】暴露信息不对称与道德风险——企业可能选择性甚至虚假填报，银行据此高估还款来源，形成信贷风险。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对入围名单先过『数据真实性』一票否决项：企业能否提供可直连、可核验的能耗与碳数据。两家无法提供真实计量、依赖手工报表的企业被剔除，锁定数据基础扎实的客户，把数据核查前置到准入环节。\n2. 电话初步建联沟通：与目标客户通话时即明确：绿色信贷以真实数据为前提，需开放能耗/碳排数据接口。客户问能否先报数后补，我坚持必须直连可核验，避免日后返工，同时说明数据增信可换利率优惠。\n3. 现场初次拜访调研：现场看计量装置是否真在采数、数据是否留痕，抽查报表与原始凭证是否一致。对只报好看数字的企业当场提示风险，留下数据核查清单，约定接入直连并明确数据责任主体。\n4. 全面尽职调查核验：以现场核验+直连监测+第三方核证三角验证数据：看原始表计、比对平台数据、引入独立机构核证。重点查核算边界、方法学与数据来源，凡对不上的一票否决，形成数据专项尽调底稿。\n5. 定制化授信方案洽谈：在方案中把『数据真实性』写成硬约束：数据直连、留存≥3年、异常预警、现场抽核，作为放款与提款前提；以数据可信换取额度与利率。客户理解并接受，敲定数据治理条款。\n6. 授信报告撰写与申报：授信报告专列数据真实性章节，附直连方案、第三方核证、留存与预警机制，说明以可信数据替代手工报表、降低信息不对称，作为授信核心依据提交。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗专项核查数据真实性与核算合规性。审查明确：数据造假一票否决，无论项目多优质一律退出并追责到人，出具审查意见。\n8. 授信审批与出具批复：审贷会重点质询数据可信度。确认直连、核证、留存与预警机制到位后，方予批准，批复中重申数据真实性为一票否决项与贷后红线。\n9. 合同签署与担保落实：在合同与附件中写入数据接入、留存、不可篡改、异常预警、现场抽核与数据造假即加速到期、退出合作的条款，压实数据责任。\n10. 放款条件核验与贷款发放：把数据接口调通、首月数据稳定上传、核证报告出具作为放款前提，达标后受托支付发放贷款，数据同步进入持续监测。\n11. 贷后全流程管理：实时监测能耗/碳排数据，设异常阈值预警，定期现场抽核比对。一次发现数据异常波动，迅速追查定位为表计故障而非造假，及时处置并记录，守住数据生命线。\n12. 到期结清与业务循环：贷款结清、数据体系成为客户管理资产。基于可信数据，我行快速续作并延伸至碳核算与绿色认证服务，把数据能力转化为长期合作粘性。"
+   }
+  ]
+ },
+ "电价波动/政策变动": {
+  "category": "风险",
+  "aiLink": "AI 跟踪电价与政策变动，把政策风险从『黑天鹅』变成『可预期的成本项』。",
+  "attachments": [
+   {
+    "name": "分时电价与现货规则跟踪表.pdf",
+    "url": "./assets/policy-tracker.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "项目四组敏感性测算模板.xlsx",
+    "url": "./assets/policy-sensitivity.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "电价市场化改革、补贴退坡、碳价与绿证政策变动，会直接影响绿色项目的收益与偿债能力，是最需要前置管理的外部风险。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『政策与价格的预测性管理』：①电价政策跟踪——AI 解析各省分时电价文件、现货规则与需求响应政策变化，自动测算对项目收益的影响；②敏感性引擎——峰谷价差±20%、利用小时±10%、碳价±30% 一键压力测试；③政策预警——退坡、追回、考核规则变化提前推送；④策略重估——触发阈值自动生成应对方案（如调整充放策略、启动担保补足）。福建模式：需求响应年度竞价边际出清、补贴从尖峰电价损益列支；政策随行就市，必须按最新文件测算。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 政策跟踪清单：分时电价时段与价差、现货市场规则、需求响应竞价价格、补助目录与退坡表、碳市场规则五类，AI 每日扫描。\n2. 敏感性标准动作：峰谷价差±20%、电价±10%、利用小时±10%、碳价±30% 四组压力测试，纳入授信与投资决策。\n3. 预警机制：政策文件发布 T+1 解析、影响量化、应对建议推送客户经理与企业。\n4. 实施步骤：政策库建设→解析引擎上线→与测算模型联动→季度重估。\n5. 预期效果：政策变动响应从天级到小时级；避免按历史高价差外推导致的高估。\n6. 可执行颗粒度：每次电价文件更新，重跑项目 IRR 与 DSCR，输出『维持/调整/补仓』三色结论。\n7. 合规要点：测算底稿与政策依据留存备查，接受监管与审计检查。\n【业务定义】光伏/风电/储能的收益高度依赖电价政策：分时电价、上网电价、补贴退坡都会改变现金流；碳价与绿证政策变动则影响碳资产与绿证收益。对初学者：做长期项目测算，绝不能只用『当前电价』单一假设，必须做多情景压力测试。\n【信贷切入点】银行应在授信方案中内置多情景压力测试与保护条款（利率调整、担保补足、再融资安排），对 10 年以上的长期项目尤为重要，避免在单一乐观假设下过度授信。\n【关键数据】敏感性分析（必做（测算关键变量变动对还款的影响））；多情景（测算要求（悲观/中性/乐观三档））\n【适用场景】所有依赖电价、补贴、碳价的绿色项目；期限较长的光伏、风电、储能贷款；收益结构中政策性收益占比高的项目"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】授信必须按最新政策口径测算，不做历史高价差外推；合同中设价差敏感性复核与担保补足触发条款；需求响应补贴不作为第一还款来源；利率挂钩 KPI 贷款须约定政策变化的重新定价机制。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】政策本身就是本节点的管理对象：福州措施 2026.1.1—2030.12.31 施行、厦门 ESG 措施 2026.1.1—2028.12.31 施行，申报窗口与有效期须逐项跟踪；税收优惠（10% 抵免）2027.12.31 到期前安排改造投入。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】电价下行致收益不及预期；补贴退坡；政策回溯或追溯调整；碳价与绿证价格波动；地方执行口径不统一。\n【新增风险与应对】执行风险：测算模型未及时更新（应对：政策库自动关联模型版本）；政策风险：退坡与追回（应对：或有收益审慎计入、不依赖补贴做还款）；市场风险：价格波动（应对：四组敏感性+补足机制）；数据合规：政策解析数据来源须权威（政府官网）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "风险雷达：连接所有收益型节点——光伏自发自用价差、储能套利、需求响应补贴、绿证碳价全部受政策定价；AI 把政策变量纳入模型，是授信稳健性与投资安全性的共同防线。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某光伏贷款在授信时做了电价 ±20% 的三情景测试，并约定电价跌破阈值即启动担保补足。后来恰逢补贴退坡、电价下行，因有保护条款而平稳过渡，未形成不良。\n【自测题】对 15 年期的光伏贷款，仅用『当前电价』单一假设测算会带来什么隐患？\n【参考要点】会系统性高估还款能力——15 年里电价很可能因市场化改革而变动，单一假设下测算出的 DSCR 虚高，一旦电价下行就出现偿债缺口。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对依赖电价、补贴、碳价的项目，先做政策情景初判：电价市场化趋势、补贴是否退坡、碳价与绿证政策走向。对高杠杆押注单一乐观政策假设的项目从严准入，剔除政策风险不可控的主体。\n2. 电话初步建联沟通：与客户通话时即提示电价与补贴政策可能变动，说明我行会做多情景测算、设置保护条款，不会按单一乐观假设放款，核实其对政策变动的承受力与应对预案。\n3. 现场初次拜访调研：现场了解项目收益对电价/补贴的依赖程度，索要历史电价结算与补贴到账记录。向客户说明将做±20%多情景测试，约定提供分时电价、补贴批复等材料。\n4. 全面尽职调查核验：做多情景现金流压力测试：电价、利用小时、碳价±20%三档，核验悲观情景下偿债覆盖率是否仍达标；核查补贴批复有效期与退坡安排，形成政策风险专项底稿。\n5. 定制化授信方案洽谈：在方案中内置保护机制：电价/补贴跌破阈值触发担保补足或利率调整、约定再融资安排；对长期项目缩短期限、压降成数。客户认可稳健取向，敲定含保护条款的方案。\n6. 授信报告撰写与申报：授信报告专列政策风险与敏感性章节，附三情景测算、保护条款与动态额度机制，说明不押注单一假设、风险有兜底，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验补贴与碳价政策依据及退坡风险。审查强调多情景测算与保护条款必须落实，提示政策回溯风险，要求动态额度管理。\n8. 授信审批与出具批复：审贷会重点质询政策变动情景。确认三情景测算、保护条款与动态额度后，方予批准，批复中明确保护机制与调价/补足触发条件。\n9. 合同签署与担保落实：在合同中写入调价、担保补足、再融资与动态额度条款，明确触发阈值与执行方式；确认项目各项合规手续与补贴批复齐备。\n10. 放款条件核验与贷款发放：核验保护条款生效、合规手续与担保登记后，按进度受托支付发放贷款，把政策保护机制同步落地。\n11. 贷后全流程管理：持续跟踪电价、补贴、碳价政策动态，定期重跑压力测试；一次补贴退坡、电价下行接近阈值，及时启动担保补足与额度重检，平稳过渡未形成不良，贷后报告如实反映。\n12. 到期结清与业务循环：贷款平稳结清。客户后续扩产再启合作，我行延续多情景测算与保护条款机制，以稳健风控赢得长期信任。"
+   }
+  ]
+ },
+ "现金流测算/减排真实性": {
+  "category": "风险",
+  "aiLink": "AI 现金流测算把『未来能不能还钱』变成一张可逐月验证的表。",
+  "attachments": [
+   {
+    "name": "项目现金流测算模型模板.xlsx",
+    "url": "./assets/cashflow-model.xlsx",
+    "type": "excel"
+   },
+   {
+    "name": "DSCR敏感性压力测试指引.pdf",
+    "url": "./assets/cashflow-dscr.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "项目现金流测算的稳健性与减排成效的真实性，共同决定还款来源是否扎实，是授信决策与贷后管理的核心。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『全周期现金流建模与预警』：①AI 建模——整合发电量/节能量/电价/负荷/成本五类输入，生成 10~15 年逐月现金流，自动计算 IRR、DSCR、回收期；②情景引擎——基准/乐观/悲观三情景+四组敏感性一键切换；③贷后预警——实际回款偏离预测 10% 即黄色预警、20% 红色预警；④还款计划优化——根据现金流季节性设计前低后高/等额本息/按季还款结构。DSCR 一般要求≥1.2，是授信审批的硬指标。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 模型输入：发电量（功率预测）、节能量（M&V）、电价（分时+现货）、利用率、运维成本、税率，五类数据自动汇聚。\n2. 输出指标：IRR/DSCR/回收期/盈亏平衡点，三情景+敏感性矩阵一页纸呈现。\n3. 数据接入：在线监测系统+结算系统+税务系统，实际数据按月回填模型。\n4. 实施步骤：模型搭建（2~4 周）→情景设定→授信申报→按月回填→季度重估。\n5. 预期效果：预测偏差从人工 20% 降到 5% 以内；风险预警提前 1~3 个月。\n6. 可执行颗粒度：8400 万元固贷按投产爬坡设计前低后高还款，首年还款额仅为稳定期的 60%。\n7. 风控红线：DSCR<1.2 不放款；连续两季度低于 1.1 触发提前条款。\n【业务定义】现金流测算要以保守假设（利用率、电价、成本）计算偿债覆盖率 DSCR（Debt Service Coverage Ratio，可还本付息现金流÷到期本息，一般要求≥1.2）；减排成效则要用实际核证数据说话。对初学者：测算宁保守勿乐观，因为银行借出去的是真金白银，收回来要靠实打实的现金流。\n【信贷切入点】银行应采用『独立测算＋压力测试＋按减排/收益进度分期放款』的闭环管理，避免前期一次性大额放款；以实际核证作为额度调整依据，把『纸面收益』与『真实现金流』的差距管住。\n【关键数据】DSCR≥1.2（审慎阈值（可还本付息现金流对到期本息的覆盖倍数））；实际核证（贷后依据（以核证数据而非自报数据放款/调额））\n【适用场景】所有以项目现金流为还款来源的中长期绿色信贷；收益依赖核证数据（节能、发电、减排）的项目；希望控制前期集中投放风险的银行"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】授信测算三件套：IRR（项目盈利能力）、DSCR（偿债能力，≥1.2）、回收期（期限匹配）；第一还款来源=项目现金流，第二还款来源=担保处置；还款计划按现金流季节性定制；利率与 DSCR 表现挂钩动态调整。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】补助与碳收益按或有收益审慎计入（一般 50% 折算）；税务口径影响净利润（三免三减半期间所得税为零、DSCR 显著改善，但不得作为唯一依据）；税收抵免逐年兑现改善现金流。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】测算过于乐观（利用率、电价拍脑袋）；减排量或发电量虚高难兑现；前期一次性放款后收益不达标；成本超支侵蚀偿债能力。\n【新增风险与应对】执行风险：模型输入数据失真（应对：在线数据直连+人工抽核）；政策风险：电价/碳价变化（应对：四组敏感性）；市场风险：需求波动（应对：订单锁定+悲观情景必测）；数据合规：财务数据分级授权、模型版本留痕。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "风险量化中枢：连接所有收益节点（光伏售电、EMC 分享款、储能套利、需求响应、碳资产）与金融节点（贷款额度/期限/利率/还款计划）；AI 现金流模型是授信审批的语言，把技术语言翻译成银行语言。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某储能项目约定按实际峰谷套利收益分期放款：首期仅放 40%，核证达标后释放剩余额度。投产后前半年实际收益略低于测算，因分期机制而未形成风险敞口，后期收益回升后全额投放。\n【自测题】『DSCR≥1.2』的审慎阈值，相比 DSCR=1.0 多预留了什么安全垫？\n【参考要点】预留了约 20% 的安全边际，用于抵御收益不及预期、成本超支、利率上行等不确定性，避免刚好够还本付息、一点波动就违约。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对以项目现金流为还款来源的中长期项目，准入即审慎：优先选择现金流可测算、可核验、保守假设下DSCR仍≥1.2的项目；对收益拍脑袋、测算明显乐观的项目从严或剔除。\n2. 电话初步建联沟通：通话时即说明我行以保守假设独立测算，不会照搬企业自算的高收益，核实其收入构成与成本，提示需提供可核验的运营数据，管理客户对额度的预期。\n3. 现场初次拜访调研：现场核实收入来源（电费/套利/补贴）与成本项，了解历史实际达成与测算的差距。提示将按实际核证分期放款，约定提供运营记录与成本明细。\n4. 全面尽职调查核验：以保守假设独立测算偿债覆盖率（DSCR），做压力测试；对收益依赖核证数据的，要求以实际核证为准；评估成本超支与工期延误风险，形成审慎测算底稿。\n5. 定制化授信方案洽谈：方案体现审慎与动态：DSCR≥1.2方予支持、按核证进度分期放款、以实际核证数据动态调额。客户希望一次足额提款，我坚持分期与节点条件，平衡后敲定条款。\n6. 授信报告撰写与申报：授信报告以独立测算与压力测试为核心，附DSCR测算、分期放款与动态额度方案，说明测算审慎、收益以核证为准，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查，重点复核测算假设与DSCR；绿色专项岗核查减排/收益核证机制。审查提示测算乐观与收益虚高风险，要求独立测算、分期放款与动态额度。\n8. 授信审批与出具批复：审贷会重点质询测算审慎度。确认DSCR、压力测试与分期放款机制后，方予批准，批复中明确分期条件与动态额度规则。\n9. 合同签署与担保落实：在合同中写入分期放款、节点核验、动态额度与加速到期条款；确认收益核证机制与账户归集安排，把测算审慎性落到合同层面。\n10. 放款条件核验与贷款发放：严格按核证进度放款：首期仅放40%，核证达标后释放剩余额度。核验运营数据与节点条件后受托支付，未达标暂缓，杜绝一次性大额投放风险。\n11. 贷后全流程管理：持续监测实际收益与测算的偏差，按核证数据动态调额；一次投产后收益略低于测算，因分期机制未形成风险敞口，动态收紧接着促，收益回升后恢复投放，贷后报告如实记录。\n12. 到期结清与业务循环：贷款按审慎节奏结清。客户后续新增融资，我行沿用独立测算+分期放款+动态额度模型，以稳健风控支撑长期合作闭环。"
+   }
+  ]
+ },
+ "碳减排支持工具": {
+  "category": "政策补贴",
+  "aiLink": "碳减排支持工具把银行资金成本打到 1.75%，AI 负责证明项目『真减排』。",
+  "attachments": [
+   {
+    "name": "碳减排支持工具政策汇编.pdf",
+    "url": "./assets/tool-policy.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "碳减排量核算报送模板.xlsx",
+    "url": "./assets/tool-calc-template.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "人民银行推出的结构性货币政策工具，向金融机构提供低成本资金，专用于支持清洁能源、节能环保、碳减排领域贷款，是绿色信贷的『资金源头活水』。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『减排量的核算与披露』：①AI 碳减排核算——按人行碳减排支持工具要求，自动核算贷款支持项目的年度碳减排量（节电量×排放因子），形成公开披露材料；②项目筛选——AI 比对清洁能源、节能环保、碳减排技术三大重点领域目录，预判项目是否符合工具范围；③存续期管理——按季跟踪发电量/节能量与资金用途，自动生成报送数据；④效益可视化——把支持项目的减排量折算成等效标准煤与碳树，服务披露。截至 2023 年 6 月末，碳减排支持工具余额 4530 亿元、支持发放贷款约 7500 亿元、带动碳减排量超 1.5 亿吨。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 工具要点：人行按贷款本金 60% 向金融机构提供资金、利率 1.75%，支持清洁能源/节能环保/碳减排技术三大领域；贷款利率与同期限 LPR 大致持平。\n2. AI 核算要点：碳减排量=项目供电量/节能量×对应排放因子，核算方法按人行披露模板执行，按季报送。\n3. 数据接入：项目在线监测系统→银行绿色金融模块→人行报送系统，数据同源。\n4. 实施步骤：领域判定→贷款发放（先贷后借）→按季核算报送→年度信息披露。\n5. 预期效果：银行低成本资金直达项目，企业实际融资成本下降 30~60BP。\n6. 可执行颗粒度：1 亿元合格碳减排贷款可获 6000 万元低成本资金支持，年节省资金成本约百万元级。\n7. 合规要点：资金用途闭环、碳减排数据可核查、公开披露及时准确。\n【业务定义】碳减排支持工具（2021年设立、延续至2027年末）采取『先贷后借』直达机制：银行按市场化原则向碳减排项目发放贷款，再向央行申请一定比例的低成本资金（利率约1.75%，远低于普通再贷款）。它要求银行公开披露碳减排贷款的项目数量、金额与碳减排量，确保资金真正流向减排领域。对初学者：这相当于央行给银行『批发便宜钱』，鼓励银行把贷款投向降碳项目，银行再把成本优势让利给企业。\n【信贷切入点】信贷切入点在于银行可借助该工具降低负债成本，从而以更优惠利率向客户投放；前提是项目属于支持范围（清洁能源、节能环保、碳减排技术三大领域）、能核算碳减排量。银行需建立项目台账、按季报送与信息披露，才能持续获得资金支持。\n【关键数据】1.75%（央行提供给银行的资金利率（成本极低））；60%（银行可申请的资金比例（按贷款本金））；2027年末（工具实施期限（现行延续至2027年底））\n【适用场景】清洁能源（光伏、风电、储能）项目建设与运营；节能环保、碳减排技术改造项目；银行希望以更低成本做绿色信贷、让利客户的场景"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】银行端运用：碳减排支持工具资金按先贷后借、利率 1.75%，引导绿色贷款定价下行；企业端体现为更低执行利率（叠加碳减排挂钩贷款的折上折机制）；碳减排数据质量直接决定工具使用合规性。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】本节点即政策本身：工具由人行创设，向 21 家全国性金融机构及部分地方法人机构提供；与地方补助（福州/厦门）形成『低成本资金+财政奖励+税收优惠』三重叠加。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】资金用途若偏离支持范围或碳减排量核算不实，可能被收回支持资金并影响银行后续申请；碳减排量测算方法不统一导致披露存疑；政策到期或退出导致低成本资金不可持续。\n【新增风险与应对】执行风险：碳减排核算错误导致报送不实（应对：AI 核算+第三方抽核）；政策风险：工具延续性与范围调整（应对：跟踪人行公告）；市场风险：LPR 变动影响利差（应对：重定价条款）；数据合规：披露数据涉企业经营信息（授权+脱敏）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "政策资金源头：上游连接所有绿色项目节点（光伏/储能/节能改造/碳技术），下游连接银行绿色信贷产品（loan/carbonfin/bill）；AI 让『真减排』可核算、可披露，是结构性货币政策工具落地的技术前提。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某银行向园区10MW光储项目发放4200万贷款，凭项目纳入碳减排支持工具范围、向央行申请到2520万低成本资金（六成），从而能以3.6%的优惠利率放款，实现银行让利、企业降本、央行支持三方共赢。\n【自测题】碳减排支持工具的『先贷后借』机制，对银行的资金运作提出了什么要求？\n【参考要点】要求银行先用自己的资金发放贷款，再凭合规项目向央行申请低成本资金，即贷款投放在前、资金申领在后；需确保项目真实合规、可核算碳减排量并接受披露。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：翻开储备项目清单，先对照碳减排支持工具的三大支持范围（清洁能源、节能环保、碳减排技术）逐户初判：是否属于目录、能否核算碳减排量、是否具备信息披露能力。两个无法核算减排量的项目暂缓，锁定园区光储等三个项目作为工具备选。\n2. 电话初步建联沟通：致电园区负责人，说明我行可借助央行碳减排支持工具拿到低成本资金、从而给出更优惠利率，询问其项目是否愿意配合做碳减排量核算与信息披露，对方认可，约看项目。\n3. 现场初次拜访调研：现场看光储项目规模与并网条件，向园区解释工具要求：项目要进支持范围、减排量要能算、要按季披露。园区担心增加负担，我说明核算可由我们协助模板化完成，留下资料清单。\n4. 全面尽职调查核验：核验项目备案、可研与减排量测算方法，确认属清洁能源领域、年减排量可测算；同步落实我行『先贷后借』的台账与报送安排，确保贷款与后续资金申请匹配，形成尽调底稿。\n5. 定制化授信方案洽谈：匹配『碳减排支持工具配套贷款』：以低成本资金为依托给予优惠利率；把减排量核算、按季报送与公开披露写入合作条款。园区认可，敲定额度、期限与利率。\n6. 授信报告撰写与申报：撰写授信报告，专列工具适用性章节，附支持范围对照、减排量测算、报送与披露方案，说明资金成本优势可让利客户，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核查项目是否真正符合支持范围、减排量核算是否可靠。审查提示资金用途偏离与披露不实风险，要求建立台账与按季报送机制。\n8. 授信审批与出具批复：审贷会关注政策适配与资金可持续。确认项目合规、可核算、可披露且利率已让利后，批复贷款，明确按工具要求管理。\n9. 合同签署与担保落实：签订借款合同，写入减排量核算、按季报送与信息披露配合条款；落实担保，确保项目手续齐备。\n10. 放款条件核验与贷款发放：核验放款前提与担保登记后发放贷款；同步建立工具台账，贷款发放在前，为后续向央行申请低成本资金做准备。\n11. 贷后全流程管理：持续核算与报送项目碳减排量，按季公开披露；一次减排量测算口径有误，及时更正并复核，确保符合工具要求、资金支持不中断，贷后报告记录披露情况。\n12. 到期结清与业务循环：贷款结清、工具运用顺畅。园区二期项目继续按该模式续作，我行积累工具运用经验并扩大披露公信力，形成可复制、可持续的长期合作。"
+   }
+  ]
+ },
+ "财政补贴/技改奖补": {
+  "category": "政策补贴",
+  "aiLink": "AI 把补助申报从『材料堆』变成『数据链』，预拨 50% 也能合规到账。",
+  "attachments": [
+   {
+    "name": "福州厦门绿色低碳政策汇编.pdf",
+    "url": "./assets/subsidy-policy.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "节能量测算与补助申报模板.pdf",
+    "url": "./assets/subsidy-template.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "中央与地方财政对节能降碳改造、清洁能源项目给予的资金奖励或补助，直接降低项目投资压力、增厚收益，是零碳工厂『看得见的第一桶金』。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『补助申报的自动化与合规化』：①AI 政策匹配——自动比对福州/厦门及国家、省级政策库，筛选企业可申报项目并排序；②节能量测算——按 M&V 方案预估节能量，对接福州『投产后按预估节能量预拨不超过 50%』的机制，提前锁定现金流；③材料生成——自动生成申报书、节能量报告、凭证清单；④到账跟踪——审批节点跟踪、绩效材料补正提醒、追回风险预警。福州政策（2026.1.1—2030.12.31）：节能改造年节能量≥150 吨标煤按 500 元/吨补助、单企业年度最高 500 万元；EMC 项目≥300 吨按 500 元/吨、最高 150 万元且不超投资额 30%；国家级绿色工厂再奖 20 万元；低零碳工厂在省奖励基础上市级再配套 50%。厦门（2026.1.1—2028.12.31）：年节能量≥200 吨项目最高 500 元/吨、每年≤200 万元；省级/国家级低零碳工厂 20 万/50 万元；绿电 0.01 元/度；CCER 每千吨 1 万元。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 政策匹配清单：福州措施（节能改造/EMC/绿色制造/低零碳/清洁生产 5 类）、厦门 ESG 措施（节能改造/低零碳/绿电/CCER/能碳中心 5 类）、省级配套（在省市奖励基础上市级再 50%）。\n2. AI 测算要点：预估节能量按改造前后双基线测算，绩效指标（节能量/减排量）与补助挂钩，达标才拿钱。\n3. 材料清单：申报书+节能量报告+合同发票+影像凭证+绩效承诺书，AI 自动归集校验。\n4. 实施步骤：政策匹配→项目备案→改造实施→节能量核证→申报→预拨 50%→绩效核验→清算。\n5. 预期效果：申报材料准备从天级到小时级；预拨 50% 提前 6~12 个月改善现金流。\n6. 可执行颗粒度：年节能量 1000 吨标煤项目，福州补助约 50 万元（预拨 25 万元）；叠加国家级绿色工厂 20 万元与省级配套。\n7. 风险红线：虚报冒领被追回并影响信用；补助不做第一还款来源；财政拨款投入不得享 10% 抵免。\n【业务定义】财政补贴形式多样：节能减排（节能降碳）补助资金、节能技术改造财政奖励、清洁能源发电补贴（部分已退坡）、近零碳/零碳工厂创建奖励等。补贴有明确的支持范围、申报窗口与绩效要求（节能量、发电量、碳减排量需达标并接受考核）。对初学者：补贴是『锦上添花』，不能当还款主力，银行测算应把它作为不确定的或有收益。\n【信贷切入点】信贷切入点在于补贴能改善项目现金流与回收期，但到账时间与金额存在不确定性。银行应将补贴作为次级或有收益审慎计入，重点核实补贴文件依据、申报条件与历史到账记录，防止把『没落地的补贴』当作还款来源。\n【关键数据】节能量/减排量（补贴绩效挂钩指标（达标才拿到钱））；一次性（多数补贴为一次性奖励（非持续性现金流））；申报窗口（补贴有明确申报期与公示要求）\n【适用场景】申报了节能降碳补助的技改项目；清洁能源发电项目（历史补贴部分退坡）；创建近零碳/零碳工厂、绿色工厂的企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】补助与授信联动：福州预拨 50% 补助可佐证项目现金流；补助资金宜划入监管账户、约定优先还贷；但补助属或有收益，授信测算按 50% 折算、不作第一还款来源；追溯补正机制写入合同。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】本节点即政策库：福州 5 类+厦门 5 类+省级配套；『免申即享』类（第四条奖励）与补助类分线管理；有效期与窗口期逐项跟踪；注意财政拨款投入不得抵免、补助绩效不达标被追回。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】补贴退坡或取消（如光伏/风电国补退坡）；绩效不达标被追回；申报未获批、到账延迟；虚报冒领被处罚并影响企业信用。\n【新增风险与应对】执行风险：绩效不达标被追回（应对：绩效承诺留有余量、按月自评）；政策风险：退坡与目录调整（应对：多政策组合不押注单一）；市场风险：到账延迟影响还款（应对：不依赖补助做还款计划）；数据合规：申报数据与监管数据一致（一数一源）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "政策红利入口：上游连接改造项目（EPC/光伏/储能/EMC 产生节能量）与碳管理（减排量核算），下游连接企业现金流与银行授信（补助进监管账户优先还贷）；AI 把政策红利变成可计划、可核验、可预期的现金流。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某玻璃厂节能改造申报省节能降碳补助，理论可获300万。银行尽调发现申报尚未获批，仅将其作为或有收益、未计入主力还款来源；放款后补贴分批到账，实际增厚了收益，风险始终可控。\n【自测题】为什么银行通常不把财政补贴作为项目的第一还款来源？\n【参考要点】补贴多为一次性、有申报窗口、有绩效条件且可能退坡或追回，到账时间与金额都不确定；稳健起见只宜作次级或有收益。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对名单内技改项目，先查是否匹配现行节能降碳补助政策与地方奖补，核实申报条件；对仅凭『听说有补贴』而无法提供政策依据的项目从严，锁定有明确政策文件支撑的玻璃厂项目。\n2. 电话初步建联沟通：致电玻璃厂，确认其节能改造项目是否已申报省级节能降碳补助、处于哪个环节。对方称材料已报、结果未出，我提示补贴不确定、测算不会把它当主力，核实融资缺口后约拜访。\n3. 现场初次拜访调研：现场看改造内容与预期节能量，索要申报回执与政策文件。厂方希望按含补贴的口径多贷，我明确补贴未获批只能算或有收益，留下资料清单并约定跟踪申报进展。\n4. 全面尽职调查核验：核验政策文件、申报材料、绩效指标（节能量/减排量）与历史类似项目到账情况；确认补贴300万尚未获批，测算中仅作或有收益，主力还款看改造后节能现金流，形成底稿。\n5. 定制化授信方案洽谈：匹配『技术改造贷款』，额度按不含补贴的稳健现金流核定；把补贴到账作为或有增信而非还款依赖。厂方理解，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附政策文件、申报回执、或有收益说明，强调不依赖未落地补贴、还款来源稳健，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验补贴政策真实性与绩效条件。审查提示退坡与追回风险，要求补贴仅作或有收益并跟踪到账。\n8. 授信审批与出具批复：审贷会认可不依赖补贴的稳健测算，批复贷款，明确补贴到账不作放款与还款前提。\n9. 合同签署与担保落实：签订借款合同与担保，落实抵押；合同不把补贴到账设为还款前提，只作或有增信，口径一致避免误导。\n10. 放款条件核验与贷款发放：核验改造进度、担保登记后受托支付发放贷款；持续跟踪补贴申报进展但不以其为条件。\n11. 贷后全流程管理：按季跟踪改造节能量与补贴进展；一次补贴因绩效材料补正延迟，因本就不依赖它，未影响还款；后补贴分批到账，作为或有增信兑现，贷后报告如实记录。\n12. 到期结清与业务循环：贷款结清、改造收益兑现。玻璃厂扩产再启合作，我行延续稳健测算口径，形成不赌补贴、可信赖的长期合作。"
+   }
+  ]
+ },
+ "税收优惠": {
+  "category": "政策补贴",
+  "aiLink": "AI 节能改造本身就是抵免对象：2024~2027 年投入 100 万，最多抵掉 10 万税。",
+  "attachments": [
+   {
+    "name": "节能环保税收优惠政策汇编.pdf",
+    "url": "./assets/tax-policy.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "数智化改造投入归集台账模板.xlsx",
+    "url": "./assets/tax-ledger.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "国家对企业从事节能环保、清洁能源项目给予的增值税、企业所得税等税收减免，是零碳工厂降低税负、增厚净收益的重要政策。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『税收优惠的自动识别与归集』：①AI 优惠匹配——自动识别企业可享的优惠组合（EMC 三免三减半、免征增值税、10% 抵免、高企 15%、研发加计）；②投入归集——按财税 2024 年第 9 号公告要求，对专用设备数智化改造投入单独核算、按设备分别归集，支出划分不清不得享受；③方案备案——改造前制定方案或取得技术合同登记，资料留存备查；④五年跟踪——改造后五个纳税年度内转让出租的，停止优惠并补缴，AI 自动跟踪资产状态。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 优惠组合拳：①EMC 项目三免三减半（财税〔2010〕110 号，自取得第一笔生产经营收入起 1~3 年免征、4~6 年减半）；②EMC 服务免征增值税（财税〔2016〕36 号附件 3）；③专用设备数智化改造 10% 抵免（财政部 税务总局公告 2024 年第 9 号，2024.1.1—2027.12.31）；④高企减按 15%；⑤研发费用 100% 加计扣除。\n2. AI 归集要点：改造投入≤设备原计税基础 50% 的部分按 10% 抵免当年应纳税额、不足抵免可结转 5 年；财政拨款投入不得抵免；运输安装调试费不计入。\n3. 适用范围：列入财税〔2017〕71 号（节能节水环保）与财税〔2018〕84 号（安全生产）目录的设备，改造后仍须符合目录条件。\n4. 实施步骤：优惠匹配→改造方案/技术合同备案→投入单独核算→申报抵免→五年资产跟踪。\n5. 预期效果：100 万元 AI 群控改造投入最高抵免 10 万元应纳税额；EMC 项目前三年所得税为零。\n6. 可执行颗粒度：改造合同按设备分拆签订，投入凭证按设备编号归档，税务鉴定备查。\n7. 风险红线：五个纳税年度内转让出租须补缴；支出划分不清不得享受；资料留存备查至少 10 年。\n【业务定义】常见优惠：企业所得税『三免三减半』（部分节能环保项目自获利年度起前三年免征、后三年减半）；节能节水、环保专用设备投资额的10%可抵免应纳税额；资源综合利用增值税即征即退；合同能源管理（EMC）税收优惠等。对初学者：税收优惠改善的是净利润与现金流，但它取决于企业有足够应纳税所得额，亏损企业当期享受不到。\n【信贷切入点】信贷切入点在于税收优惠能改善企业净现金流与偿债能力，但银行应核实优惠的适用条件、备案要求与企业实际税负情况；把税收利益作为审慎增强项，并防范企业为享受优惠而扭曲经营的风险。\n【关键数据】三免三减半（企业所得税优惠（节能环保项目常见））；10%（节能设备投资额抵免应纳税额比例）；即征即退（资源综合利用增值税优惠方式）\n【适用场景】从事节能环保、资源综合利用并有应纳税所得的企业；采购节能节水/环保专用设备的技改项目；实施合同能源管理（EMC）的ESCO与企业"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】税务优惠改变现金流：EMC 三免三减半期间项目所得税为零，DSCR 与 IRR 显著改善，授信测算可反映该改善（但不作为唯一依据）；免税期结束后现金流回落须在模型中体现；税收抵免逐年兑现可约定提前还款安排。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】本节点即政策库：财税〔2010〕110 号（EMC）、财税〔2016〕36 号附件 3（免征增值税）、财政部 税务总局公告 2024 年第 9 号（10% 抵免，2027.12.31 到期）、高企 15%（《企业所得税法》第 28 条）、研发 100% 加计（2023~2027 不分行业）。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】企业无应纳税所得额当期无法享受；优惠条件变化或备案不全丧失资格；为享受优惠而扭曲交易（如关联交易定价）；政策到期调整。\n【新增风险与应对】执行风险：投入归集不清丧失优惠（应对：按设备单独核算+凭证编号管理）；政策风险：优惠到期与目录更新（应对：2027 年底前安排改造投入、跟踪目录版本）；市场风险：企业无应纳税所得额时抵免落空（应对：结合盈利预测安排投入节奏）；数据合规：改造合同与投入凭证涉商业秘密（授权+留痕）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "政策红利放大器：上游连接所有改造项目（空压/空调/储能/监测的投入即抵免基数），下游连接企业净利润与银行授信测算（免税期 DSCR 显著改善）；AI 归集让『花了改造钱就能抵税』合规落地，是零碳工厂最直接的现金回报之一。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某环保企业技改享『三免三减半』，银行测算时只按常规税负口径从严，把减免作为审慎增强；企业盈利稳定、优惠如期兑现，净现金流改善进一步夯实还款，风险始终稳健。\n【自测题】为什么亏损企业对『三免三减半』当期可能享受不到实惠？\n【参考要点】『三免三减半』免/减的是企业所得税，没有应纳税所得额就无税可免；企业需有盈利才能真正兑现该优惠。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对名单内项目，先查企业是否具备享受节能环保税收优惠的条件与盈利基础；对长期亏损、无税可享的企业，剔除税收优惠这一加分项、回归经营现金流本身，锁定盈利稳定的环保企业。\n2. 电话初步建联沟通：致电企业财务，了解其技改项目是否适用『三免三减半』或设备投资抵免、是否已完成优惠备案，核实实际税负，说明我行测算会从严、不押注税收减免，约看账。\n3. 现场初次拜访调研：看技改内容与设备清单，核对优惠适用条件；财务坦言近年盈利波动。我提示无应纳税所得额时优惠落空，留下优惠备案与税务资料清单，约定核实税负。\n4. 全面尽职调查核验：核验优惠条件、备案资料与近三年纳税申报、实际税负；测算中仅按常规税负从严，把减免作审慎增强，不因优惠上调授信，形成底稿。\n5. 定制化授信方案洽谈：匹配『技术改造贷款』，额度按不含税收优惠的稳健现金流核定；把优惠兑现作为或有增信。企业认可从严口径，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附优惠条件与备案、实际税负分析，说明税收利益仅作审慎增强、不依赖，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验优惠合规性与备案完备性。审查提示无税可享与政策到期风险，要求不依赖税收优惠测算。\n8. 授信审批与出具批复：审贷会认可从严口径，批复贷款，明确税收优惠不作授信与还款的核心依据。\n9. 合同签署与担保落实：签订借款合同与担保，落实抵押；合同不把税收优惠设为还款前提，口径一致。\n10. 放款条件核验与贷款发放：核验改造进度与担保登记后受托支付放款；同步提示企业备齐优惠留存资料，合规享受。\n11. 贷后全流程管理：按季跟踪企业盈利与税负、优惠备案有效性；一年企业盈利改善、减免如期兑现，净现金流增厚，我行仍按原稳健口径评估，贷后报告记录增强情况。\n12. 到期结清与业务循环：贷款结清、优惠合规兑现。企业扩产再启合作，我行延续从严测算与合规提示，形成稳健可信的长期伙伴关系。"
+   }
+  ]
+ },
+ "分时电价/需求响应补贴": {
+  "category": "政策补贴",
+  "aiLink": "AI 调度平台把空调、充电桩、产线变成可报价、可响应、可结算的电力商品。",
+  "attachments": [
+   {
+    "name": "福建省需求响应竞价操作指引.pdf",
+    "url": "./assets/dr-bidding.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "需求响应基线计算方法说明.pdf",
+    "url": "./assets/dr-baseline.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "分时电价（峰谷平段不同电价）与需求响应补贴（电网紧张时让电获补偿）等价格型政策，直接影响工厂用电成本与储能、负荷管理的收益空间。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『需求响应的智能化运营』：①AI 负荷预测——96 点曲线预测指导竞价申报价格与容量，避免裸奔；②资源分级调度——非生产负荷秒级、辅助负荷分钟级、主产线负荷协议级，AI 按邀约自动拆解指令；③基线管理——按电力负荷管理中心约定算法生成基线，响应时段最大/平均负荷均须低于基线且差值≥申报量 50%；④收益结算——实际响应负荷×响应时间×补贴价格，经电费退补到账，AI 自动对账。福建：每年 5 月底前签协议、6 月 15 日前集中竞价（边际出清）、补贴从尖峰电价损益列支；厦门：补偿基准价 4 元/kWh×价格系数（0~1）×速度系数（1~3），200kW 以上可直接参与。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 参与条件：响应负荷能力≥200kW 可直接参与（厦门口径），200kW 以下由负荷聚合商代理；聚合商需≥1000kW 聚合能力。\n2. AI 调度要点：申报价格按边际出清历史分位设定；响应指令经新型电力负荷管理系统下发，终端秒级执行。\n3. 数据接入：新型电力负荷管理系统+网上国网 APP+企业 EMS，三端数据实时对齐。\n4. 实施步骤：资源摸排→协议签订（5 月底前）→能力核验→年度竞价（6 月 15 日前）→邀约响应→电费退补。\n5. 预期效果：单次响应收益=响应负荷×时长×补贴价；年参与 20 次以上形成稳定第二收入。\n6. 可执行颗粒度：500kW 可调资源、年响应 20 次×2 小时，厦门口径年收益约 4~8 万元；聚合商与企业按协议比例分成。\n7. 风险红线：无效响应无补贴且可能考核；保安负荷严禁接入；响应时段不低于 1 小时。\n【业务定义】分时电价把一天划为峰、平、谷，电价差异（峰谷价差）越大，储能套利空间越大、引导错峰用电的效果越强；需求响应则是电网在供应紧张时邀约用户短时降功率并支付补贴，价格型需求响应按出清价格补偿。对初学者：这是电力市场化改革的政策组合，储能的钱、错峰的钱都从这里来，但它随政策调整而变。\n【信贷切入点】信贷切入点在于峰谷价差与需求响应补偿构成储能、负荷管理项目的核心收益。银行应依据最新分时电价文件与需求响应规则测算收益，并做价差敏感性——因为价差政策是会调整的，不能按历史高价差外推。\n【关键数据】峰谷价差元/kWh（储能套利空间来源（随分时电价政策调整））；分时时段（峰平谷时段划分（各省不同））；出清价格（价格型需求响应的补偿依据）\n【适用场景】峰谷价差大、适配电化学储能的地区；有可中断负荷、可参与需求响应的工厂；接入虚拟电厂参与电力市场的用能主体"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】需求响应收益权可质押：福建补贴经电费退补、现金流可测，按近 12 个月平均响应收益核定质押率（50%~70%）；亦可组合流动资金贷款+利率挂钩降碳 KPI 的绿色激励贷；响应收益不作第一还款来源、作审慎增强。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】本节点即政策：福建省电力需求响应实施方案（2024 年施行、有效期 5 年，年度竞价边际出清）+厦门方案（2023—2025，4 元/kWh 基准）+省负荷管理实施细则（闽发改法规〔2024〕10 号，2025 年需求响应能力达地区最大负荷 5%）。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】峰谷价差收窄或时段调整压缩储能套利；需求响应补偿标准下调或规则变化；响应不及格被考核罚款；地方执行口径不统一。\n【新增风险与应对】执行风险：响应不合格（应对：响应前预演+分级接入+基线确认）；政策风险：竞价价格与规则调整（应对：按保守价测算+多年度跟踪）；市场风险：邀约频次不确定（应对：不作为还款依赖）；数据合规：负荷与生产数据接入电网系统须通过电力监控系统安全防护规定。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "市场运营枢纽：上游连接负荷管理（可调资源）与储能（最快响应资源），下游连接电力市场（现货/辅助服务）与 EMS（日常优化）；AI 把工厂从『电价接受者』变成『市场参与者』，需求响应收益是运营期最灵活的创新现金流。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某园区储能项目授信时，银行按最新分时电价文件测算并做价差±20%压力测试；后遇价差阶段性收窄，因有敏感性预案与担保补足机制，收益虽降但偿债仍达标，未形成风险。\n【自测题】用历史高价差外推储能项目未来收益，会有什么隐患？\n【参考要点】分时电价政策会调整，历史高价差未必持续；外推会高估套利收益，一旦价差收窄，项目现金流与偿债覆盖率将不及预期。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对储能与负荷管理类项目，先按最新分时电价文件核验当地峰谷价差与时段划分，剔除依赖已取消的高价差政策测算的项目，锁定价差真实、时段稳定的园区储能项目。\n2. 电话初步建联沟通：致电园区，确认其储能项目测算所用的价差来源是否为现行政策、是否参与需求响应；提示我行按最新文件测算并做敏感性，约看负荷与电价资料。\n3. 现场初次拜访调研：看配电负荷曲线、储能配置与可中断环节；园区希望按往年高价差多贷，我出示最新分时电价文件，说明价差会调整、测算要保守，留下资料清单。\n4. 全面尽职调查核验：按最新分时电价与需求响应规则测算收益，做价差±20%敏感性；核验历史响应考核与补偿到账；确认收益可测、政策风险有预案，形成底稿。\n5. 定制化授信方案洽谈：匹配『固定资产贷款』，额度按保守价差口径核定；设价差收窄触发担保补足条款。园区认可稳健取向，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附最新电价文件、收益与价差敏感性测算、补足机制，说明不押注高价差，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核验分时电价与需求响应政策依据。审查提示价差收窄与考核风险，要求敏感性与补足机制。\n8. 授信审批与出具批复：审贷会认可保守测算与补足机制，批复贷款，明确按最新政策口径执行。\n9. 合同签署与担保落实：签订借款合同与担保，写入价差敏感性复核与担保补足触发条款，确保政策变动有应对。\n10. 放款条件核验与贷款发放：核验设备到货、并网调试与担保登记后，按进度受托支付发放贷款。\n11. 贷后全流程管理：持续跟踪分时电价与需求响应政策调整，定期重跑价差敏感性；一次价差收窄接近阈值，启动复核与补足，收益虽降但偿债仍达标，贷后报告如实反映。\n12. 到期结清与业务循环：贷款结清、收益稳健兑现。园区扩储能并接入VPP，我行延续最新政策口径与敏感性机制续作，深化合作。"
+   }
+  ]
+ },
+ "绿色债券/绿色金融政策": {
+  "category": "政策补贴",
+  "aiLink": "AI 让绿债与 SLL 的 KPI 可量化、可核证、可披露，绿色金融才立得住。",
+  "attachments": [
+   {
+    "name": "绿色债券与SLL产品手册.pdf",
+    "url": "./assets/bond-product.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "绿色债券支持项目目录对照表.pdf",
+    "url": "./assets/bond-directory.pdf",
+    "type": "pdf"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "绿色债券（绿债）与可持续发展挂钩贷款（SLL）等绿色金融政策工具，为零碳项目提供直接融资与多元化资金渠道，也是银行服务企业的重要抓手。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『绿色金融的智能风控与定价』：①AI 用途核查——自动比对募资项目与《绿色债券支持项目目录》，识别漂绿；②SLL 的 KPI 管理——AI 持续跟踪 ESG/降碳 KPI 达成情况，自动触发利率调整；③信息披露——自动生成存续期披露报告，降低合规成本；④碳效益测算——把支持项目的减排量折算经济效益（兴业银行厦门分行碳减排/碳效益挂钩贷款 8 笔、超 1.25 亿元，支持项目年节标煤超 5600 吨、减排 CO₂ 超 1.4 万吨）。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 产品结构：绿色债券（用途绿，需第三方认证）+SLL（绩效绿，利率挂钩 KPI）+绿色银团+并购贷款（绿色）组合。\n2. AI 用途核查：募资项目逐项对照目录，偏离自动预警；资金专户监管、流向可追溯。\n3. KPI 管理：SLL 设定可量化 KPI（如年度减排量），第三方核证后执行利率调整（达标降息）。\n4. 数据接入：项目监测系统+碳核算平台+披露系统三流合一。\n5. 实施步骤：项目筛选→目录对照→第三方认证→发行/放款→KPI 年度核证→披露。\n6. 预期效果：综合融资成本较普通贷款明显下降；绿色标签提升资本市场认可度。\n7. 可执行颗粒度：10 亿元绿债+SLL 组合，SLL 挂钩年减排 10 万吨 KPI，达标年降息 10~20BP。\n8. 风控红线：资金用途漂绿、KPI 不可验证、披露不到位是三大禁区。\n【业务定义】绿色债券是募集资金专用于绿色项目的债券，需符合《绿色债券支持项目目录》并接受第三方认证与信息披露；此外还有可持续发展挂钩贷款（SLL，利率与ESG KPI挂钩）、转型金融等。对初学者：绿债解决『大额长期』资金需求，SLL把融资成本与企业减碳表现绑定，是绿色金融政策的组合拳。\n【信贷切入点】信贷切入点在于：对银行，可为客户提供绿债承销、SLL、绿团等投行+信贷综合服务；对企业，绿债与SLL可降低融资成本、优化负债结构。银行需核验资金用途绿色、KPI可验证，并做好信息披露与存续期管理。\n【关键数据】绿色债券目录（募资用途须符合的支持范围）；第三方认证（绿债发行的必要增信与合规环节）；ESG KPI（SLL利率挂钩的可持续绩效指标）\n【适用场景】有大规模绿色项目融资需求的企业/平台；希望以更低成本、更优结构融资的绿色主体；有明确ESG绩效目标、愿挂钩利率的客户"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】投行+信贷综合服务：绿债承销/投资+SLL+绿色银团；授信逻辑=用途合规+KPI 可验证+信息披露到位；还款来源=项目现金流（债券）或企业整体现金流（SLL）；SLL 利率与降碳 KPI 挂钩动态调整。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】绿债享绿色债券市场政策与地方绿色金融奖励（厦门对绿色金融债发行给予支持）；SLL 与碳减排支持工具、地方补助形成组合；发行人可叠加高企与绿色制造认定红利。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】资金用途『漂绿』或偏离目录；KPI设定不科学、核验困难；信息披露不到位引发合规与声誉风险；债券存续期管理与再融资风险。\n【新增风险与应对】执行风险：用途偏离目录、KPI 设定不科学（应对：第三方认证+KPI 第三方核证）；政策风险：绿色债券目录更新（应对：跟踪目录版本）；市场风险：债券存续期与再融资风险（应对：期限匹配+备证）；数据合规：披露数据真实完整（审计+留痕）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "资本市场枢纽：上游连接大型绿色项目（风光储园区、零碳工厂）与绿色信贷（ loan 节点），下游连接投资者与评级机构；AI 把绿色属性变成可验证的定价因子，连接信贷市场与资本市场两个资金池。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某新能源平台拟发10亿绿色债券用于风光储项目，我行担任承销商并配套SLL：债券资金用途经第三方认证符合目录，SLL设定减排KPI挂钩利率，综合融资成本较普通贷款明显下降。\n【自测题】可持续发展挂钩贷款（SLL）与绿色贷款，在资金用途约束上有什么不同？\n【参考要点】绿色贷款要求资金专项用于绿色项目（用途绿）；SLL不限定用途，而是把利率与企业的ESG/减碳KPI挂钩，用定价激励绩效提升（绩效绿）。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对有大规模绿色融资需求的客户，先判是否适合绿债/SLL：是否有符合绿色债券目录的项目、是否有可量化的ESG绩效。某新能源平台风光储项目体量大、目标清晰，初判适合，锁定为重点。\n2. 电话初步建联沟通：致电平台融资部，介绍我行可提供绿债承销+SLL+绿团综合服务，核实其融资规模约10亿、期限偏好与ESG目标，约看项目与治理架构。\n3. 现场初次拜访调研：看风光储项目清单与资金用途规划，了解其减碳目标与披露基础。平台关心成本与结构，我留下绿债与SLL方案，约定梳理项目与KPI。\n4. 全面尽职调查核验：核验项目是否均符合绿色债券目录、资金用途可闭环；评估SLL的KPI是否可量化可核证；核查平台信用与信息披露能力，形成尽调意见。\n5. 定制化授信方案洽谈：定制『绿色债券承销＋SLL＋绿团』组合：10亿绿债经第三方认证用于风光储，SLL设定减排KPI挂钩利率。平台认可，敲定发行与配套条款。\n6. 授信报告撰写与申报：撰写投行+信贷综合报告，附项目目录对照、第三方认证安排、KPI设计与披露方案、定价测算，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核查用途合规与KPI可验证性，防范漂绿。审查提示信息披露与存续期管理风险，要求认证与披露到位。\n8. 授信审批与出具批复：审贷会关注用途真实与KPI科学性。确认目录合规、认证与披露机制后，批复承销与SLL配套额度，出具批复。\n9. 合同签署与担保落实：签署承销、SLL与绿团协议，落实KPI挂钩条款、信息披露与存续期跟踪安排；确认募集资金专户与用途监管。\n10. 放款条件核验与贷款发放：核验第三方认证、资金专户与信息披露文件后，绿债发行缴款、SLL放款，资金按用途监管投放。\n11. 贷后全流程管理：按年核验SLL的KPI达成并执行利率调整，跟踪绿债资金用途与信息披露；一年KPI达标，按约下调利率，贷后报告记录绩效与定价联动。\n12. 到期结清与业务循环：债券按期兑付、SLL正常周转。平台持续融资，我行以绿债+SLL+绿团综合服务深化合作，形成长期绿色金融伙伴关系。"
+   }
+  ]
+ },
+ "设备更新专项/超长期国债": {
+  "category": "政策补贴",
+  "aiLink": "AI 设备改造正好落在国家设备更新的钱袋子里：投 100 万，10% 抵税+贴息补助。",
+  "attachments": [
+   {
+    "name": "设备更新与数智化改造政策汇编.pdf",
+    "url": "./assets/equip-policy.pdf",
+    "type": "pdf"
+   },
+   {
+    "name": "高耗能设备诊断清单模板.xlsx",
+    "url": "./assets/equip-diagnosis.xlsx",
+    "type": "excel"
+   }
+  ],
+  "items": [
+   {
+    "id": 1,
+    "title": "节点定位",
+    "text": "国家推动大规模设备更新与节能降碳改造的政策资金，包括超长期特别国债支持设备更新、专项再贷款与贴息，为零碳工厂改造提供低成本资金窗口。"
+   },
+   {
+    "id": 2,
+    "title": "AI节能关联",
+    "text": "AI 节能主线是『设备更新的数智化窗口』：①AI 诊断低效设备——扫描电机、变压器、空压机等高耗能设备台账，对照能效强制标准识别淘汰与改造清单；②改造方案——加装传感器与智能控制（即数智化改造），同时申报 10% 抵免与更新补助；③效能验证——改造前后能效数据对比，支撑绩效评价与后续申报。政策背景：国发〔2024〕7 号《推动大规模设备更新和消费品以旧换新行动方案》与财政部 税务总局公告 2024 年第 9 号形成组合拳；福州另有技改投资补助（年度设备含软件实际投资额≥100 万元的技改项目按不超过 3% 补助、单企业≤500 万元，马尾开发区口径）。"
+   },
+   {
+    "id": 3,
+    "title": "关键扩展内容",
+    "text": "1. 政策组合：设备更新专项+超长期特别国债支持方向+技改投资补助（福州按≤3%、≤500 万元）+数智化改造 10% 抵免（≤设备原计税基础 50% 部分）。\n2. AI 诊断要点：设备台账×能效标准×运行数据三维比对，输出淘汰/改造/维持三色清单。\n3. 改造内容：数据采集+传输存储+分析+智能控制+数字安全五类投入（财税 9 号公告明确列举）均计入抵免范围。\n4. 数据接入：设备运行数据上云，改造前后能效对比报告自动生成。\n5. 实施步骤：设备诊断→更新清单→改造实施→能效验证→补助申报+抵免申报。\n6. 预期效果：低效设备淘汰后系统能效提升 10%~30%；叠加补助与抵免，实际投资成本下降 15%~25%。\n7. 可执行颗粒度：更换 10 台一级能效电机（约 80 万元）+加装智控（20 万元），抵免约 10 万元+技改补助约 3 万元。\n8. 风险红线：财政拨款投入不得抵免；改造后仍须符合专用设备目录条件；五年内转让出租须补缴。\n【业务定义】2024年起国家推行大规模设备更新行动，超长期特别国债与专项政策资金重点支持节能降碳改造、重点用能设备更新（一级能效电机、高效锅炉等），部分配套贴息与专项再贷款。对初学者：这是『政策资金+银行信贷』的组合窗口，项目要进支持清单、设备要符合能效标准，才能对接。\n【信贷切入点】信贷切入点在于政策资金可作项目资本金或贴息来源，降低企业出资压力与融资成本。银行应核实项目是否纳入设备更新支持范围、设备能效是否达标，并叠加专项信贷/贴息，帮助企业用足政策窗口。\n【关键数据】一级能效（重点用能设备更新目标（电机、锅炉等））；超长期国债（支持设备更新的政策性资金来源）；贴息/专项（部分配套的贴息与专项再贷款安排）\n【适用场景】更新一级能效电机、高效锅炉等重点用能设备的企业；纳入地方设备更新与节能降碳项目清单的改造；希望用足政策资金+贴息窗口的工厂"
+   },
+   {
+    "id": 4,
+    "title": "金融接口",
+    "text": "【可用信贷产品与授信逻辑】①合同能源管理（EMC）贷款——以节能效益分享型合同为基础，ESCO/企业无需一次性投入，额度约总投资70%、期限3~8年；②未来收益权质押——将节能效益分享款、售电收益、租金、需求响应补贴等未来现金流确权后质押给银行，作为第一还款来源；③利率挂钩降碳KPI的绿色激励贷（SLL/碳减排挂钩贷款）——约定年度节能量或减排量KPI，经第三方核证达标即下调利率，兴业银行厦门分行已落地碳减排/碳效益挂钩贷款8笔、超1.25亿元，支持项目年节标煤超5600吨；④融资租赁——储能柜、空压机组、磁悬浮机组等由租赁公司购置、企业付租、期满留购，不占用授信额度；⑤补贴资金监管账户——福州对节能改造项目按预估节能量预拨不超过50%补助，补助资金宜划入监管账户并约定优先还贷。【还款来源排序】节点自身可测算现金流＞补贴（或有收益，一般按50%折算）＞担保处置；【担保组合】收益权质押+设备/房产抵押+实控人保证；【利率红利】符合人行碳减排支持工具范围的（清洁能源、节能环保、碳减排技术三大领域），银行可按贷款本金60%、利率1.75%获得低成本资金，带动执行利率下行。\n【本节点要点】设备更新适用技改贷款/设备融资租赁（租赁公司购设备、企业付租期满留购）；改造后能效提升改善经营现金流；10% 抵免逐年兑现可约定提前还款；利率可挂钩能效 KPI。"
+   },
+   {
+    "id": 5,
+    "title": "补贴/免税接口",
+    "text": "【地方奖励·福州市《关于推动工业绿色低碳发展的若干措施》，2026.1.1—2030.12.31施行】年节能量≥150吨标煤的节能改造项目按500元/吨补助、单企业年度最高500万元（投产后按预估节能量预拨不超过50%）；EMC项目年节能量≥300吨按500元/吨补助、最高150万元且不超过投资额30%；国家级绿色工厂/供应链示范企业/绿色园区再奖20万/30万/100万元；国家级和省级低零碳工厂在省奖励基础上市级再配套50%；自愿性清洁生产审核通过奖5万元；技改设备（含软件）投资≥100万元按≤3%补助、单企业≤500万元。【地方奖励·厦门市《促进ESG发展若干措施》，2026.1.1—2028.12.31施行】年节能量≥200吨标煤项目最高500元/吨、每年每企业≤200万元；省级/国家级低零碳工厂分别奖20万/50万元（晋级补差30万）；绿电绿证交易按结算电量0.01元/度奖励、每年≤50万元；CCER每出售千吨CO₂e奖1万元、每年≤20万元；数字化能碳管理中心按≤30%总投资补助（≤60万元）；产品碳足迹/碳中和认证按≤50%服务合同补助（≤20万元/年）。【税收优惠】EMC项目自取得第一笔生产经营收入所属纳税年度起三免三减半（财税〔2010〕110号）；符合条件的EMC服务免征增值税（财税〔2016〕36号附件3）；2024.1.1—2027.12.31专用设备（财税〔2017〕71号、财税〔2018〕84号目录内）数智化改造投入不超过原计税基础50%的部分按10%抵免应纳税额、可结转5年（财政部 税务总局公告2024年第9号）；高新技术企业减按15%（《企业所得税法》第28条）；研发费用100%加计扣除（2023—2027）。\n【本节点要点】本节点即政策组合：国发〔2024〕7 号大规模设备更新+财税 2024 年第 9 号 10% 抵免+福州技改投资补助（≤3%、≤500 万元）+淘汰落后产能目录；注意财政拨款投入不得抵免。"
+   },
+   {
+    "id": 6,
+    "title": "风险点",
+    "text": "【主要风险】项目未纳入支持清单或设备不达标；资金下达与拨付延迟；政策窗口期有限、错过后成本上升；虚报设备清单被追责。\n【新增风险与应对】执行风险：改造后不达目录条件丧失优惠（应对：改造前目录比对+验收指标）；政策风险：补助与工具退坡（应对：窗口期内完成申报）；市场风险：设备价格波动（应对：分批采购+框架协议）；数据合规：设备运行数据涉工艺参数（脱敏+授权）。"
+   },
+   {
+    "id": 7,
+    "title": "上下游关联",
+    "text": "设备更新支点：上游连接 EPC（改造实施）与监测（能效数据），下游连接 EMS（智能运行）与税收节点（抵免申报）；AI 诊断把『该换什么设备』变成数据决策，是政策资金与税收优惠的共同入口。"
+   },
+   {
+    "id": 8,
+    "title": "案例与自测",
+    "text": "【案例速览】某制造企业更新一级能效电机与高效锅炉，纳入省设备更新清单并获超长期国债资金支持，我行配套设备更新改造贷款并按政策给予贴息，企业出资压力大减、融资成本显著下降。\n【自测题】对接设备更新政策资金，银行最应核实哪两点？\n【参考要点】一是项目是否真实纳入支持范围/清单，二是更新设备是否真正符合能效等硬性标准，防止为套政策而虚报。"
+   },
+   {
+    "id": 9,
+    "title": "客户经理日记（12个时间点）",
+    "text": "1. 客户清单初筛与准入研判：对照大规模设备更新与节能降碳支持清单，核查企业改造项目是否在列、拟更新设备能效是否达标（电机一级能效、锅炉高效等）。某制造企业清单内、设备达标，锁定；两家设备能效不达标或不在清单内的，剔除。\n2. 电话初步建联沟通：致电企业设备部，确认其电机与锅炉更新是否已纳入省设备更新清单、政策性资金申请到哪一步；提示我行可配套专项贷款与贴息，约看设备与清单材料。\n3. 现场初次拜访调研：看待更新设备清单与能效参数，核对清单入库回执。企业希望资金快点到位，我留下方案与资料清单，约定梳理政策性资金申请进度。\n4. 全面尽职调查核验：核验项目入库文件、设备能效证明与采购计划、政策性资金拨付安排；叠加专项信贷与贴息优化融资结构，测算企业出资压力显著下降，形成底稿。\n5. 定制化授信方案洽谈：匹配『设备更新改造贷款』并叠加贴息/专项：额度覆盖设备与安装、按政策争取贴息，把政策性资金到位节点与放款匹配。企业认可，敲定条款。\n6. 授信报告撰写与申报：撰写授信报告，附入库文件、设备能效证明、政策性资金与贴息安排、专项信贷测算，说明用足政策窗口、结构最优，提交审批。\n7. 风险审查与绿色专项审核：风控做常规审查；绿色专项岗核查清单真实性与设备能效达标。审查提示资金延迟与虚报风险，要求以实际入库与能效证明为准。\n8. 授信审批与出具批复：审贷会认可政策适配与结构优化，批复设备更新改造贷款并落实贴息路径，明确资金到位节点管理。\n9. 合同签署与担保落实：签订借款合同与担保，落实抵押；把政策性资金拨付、贴息兑现与设备验收写入合同节点，确保政策资金真正用于项目。\n10. 放款条件核验与贷款发放：核验设备采购合同、入库文件与担保登记后，按采购进度受托支付发放贷款，叠加贴息降低企业成本。\n11. 贷后全流程管理：跟踪政策性资金拨付与设备安装调试、能效核验；一次资金下达延迟，协调专款与放款节奏衔接，未影响工期，贷后报告记录政策资金使用情况。\n12. 到期结清与业务循环：贷款结清、设备投产达标。企业分批更新其他产线，我行延续设备更新专项+贴息模式续作，用足政策窗口形成长期合作。"
+   }
+  ]
+ }
+};
+const META = [
+ {
+  "id": "epc",
+  "label": "节能改造EPC",
+  "en": "Energy Retrofit EPC",
+  "icon": "🏗️",
+  "seg": "up",
+  "angle": 350
+ },
+ {
+  "id": "roof",
+  "label": "分布式光伏(屋顶)",
+  "en": "Distributed Rooftop PV",
+  "icon": "🔆",
+  "seg": "up",
+  "angle": 339
+ },
+ {
+  "id": "windpv",
+  "label": "风电光伏(地面)",
+  "en": "Wind-PV Hybrid",
+  "icon": "🌬️",
+  "seg": "up",
+  "angle": 328
+ },
+ {
+  "id": "windppa",
+  "label": "分散式风电/风电PPA",
+  "en": "Distributed Wind & PPA",
+  "icon": "🤝",
+  "seg": "up",
+  "angle": 317
+ },
+ {
+  "id": "storage",
+  "label": "储能配套",
+  "en": "Energy Storage",
+  "icon": "🔋",
+  "seg": "up",
+  "angle": 306
+ },
+ {
+  "id": "load",
+  "label": "储能与负荷管理",
+  "en": "Load & Storage Mgmt",
+  "icon": "⚡",
+  "seg": "mid",
+  "angle": 6
+ },
+ {
+  "id": "ems",
+  "label": "EMS能源管理",
+  "en": "EMS",
+  "icon": "🖥️",
+  "seg": "mid",
+  "angle": 17
+ },
+ {
+  "id": "mon",
+  "label": "能耗在线监测",
+  "en": "Energy Monitoring",
+  "icon": "📊",
+  "seg": "mid",
+  "angle": 28
+ },
+ {
+  "id": "carbon",
+  "label": "碳管理系统",
+  "en": "Carbon Management",
+  "icon": "☁️",
+  "seg": "mid",
+  "angle": 39
+ },
+ {
+  "id": "emc",
+  "label": "合同能源管理",
+  "en": "Energy Performance Contracting",
+  "icon": "📑",
+  "seg": "mid",
+  "angle": 50
+ },
+ {
+  "id": "preloan",
+  "label": "项目前期贷",
+  "en": "Project Preliminary Loan",
+  "icon": "📋",
+  "seg": "fin",
+  "angle": 137
+ },
+ {
+  "id": "faloan",
+  "label": "固定资产贷款",
+  "en": "Fixed Asset Loan",
+  "icon": "🧱",
+  "seg": "fin",
+  "angle": 148
+ },
+ {
+  "id": "plant",
+  "label": "工业厂房贷",
+  "en": "Industrial Plant Loan",
+  "icon": "🏢",
+  "seg": "fin",
+  "angle": 159
+ },
+ {
+  "id": "loan",
+  "label": "绿色项目贷/固定资产贷/供应链金融",
+  "en": "Green & Fixed-Asset Loans",
+  "icon": "🏦",
+  "seg": "fin",
+  "angle": 170
+ },
+ {
+  "id": "carbonfin",
+  "label": "碳配额质押融资/碳金融",
+  "en": "Carbon Pledge Finance",
+  "icon": "💠",
+  "seg": "fin",
+  "angle": 181
+ },
+ {
+  "id": "bill",
+  "label": "票据/供应链/碳履约保函",
+  "en": "Bills, SCF & Guarantee",
+  "icon": "🧾",
+  "seg": "fin",
+  "angle": 192
+ },
+ {
+  "id": "guarantee",
+  "label": "保函业务（非融资性）",
+  "en": "Non-Financial Guarantee",
+  "icon": "🛡️",
+  "seg": "fin",
+  "angle": 203
+ },
+ {
+  "id": "payroll",
+  "label": "代发业务",
+  "en": "Payroll Agency Service",
+  "icon": "💳",
+  "seg": "fin",
+  "angle": 214
+ },
+ {
+  "id": "mfg",
+  "label": "制造企业客户/碳减排主体",
+  "en": "Manufacturer",
+  "icon": "🏭",
+  "seg": "down",
+  "angle": 268
+ },
+ {
+  "id": "gec",
+  "label": "节能收益/绿证交易",
+  "en": "Saving & GEC Revenue",
+  "icon": "♻️",
+  "seg": "down",
+  "angle": 279
+ },
+ {
+  "id": "ccer",
+  "label": "碳配额与CCER",
+  "en": "Allowance & CCER",
+  "icon": "🌱",
+  "seg": "down",
+  "angle": 290
+ },
+ {
+  "id": "data",
+  "label": "数据真实/碳核算合规",
+  "en": "Data Integrity & Compliance",
+  "icon": "🔍",
+  "seg": "risk",
+  "angle": 230
+ },
+ {
+  "id": "policy",
+  "label": "电价波动/政策变动",
+  "en": "Price & Policy Risk",
+  "icon": "📉",
+  "seg": "risk",
+  "angle": 241
+ },
+ {
+  "id": "cashflow",
+  "label": "现金流测算/减排真实性",
+  "en": "Cashflow & Abatement Reality",
+  "icon": "🧮",
+  "seg": "risk",
+  "angle": 252
+ },
+ {
+  "id": "tool",
+  "label": "碳减排支持工具",
+  "en": "Carbon Emission Reduction Support Tool",
+  "icon": "🏛️",
+  "seg": "pol",
+  "angle": 66
+ },
+ {
+  "id": "subsidy",
+  "label": "财政补贴/技改奖补",
+  "en": "Fiscal Subsidy & Retrofit Awards",
+  "icon": "💰",
+  "seg": "pol",
+  "angle": 77
+ },
+ {
+  "id": "tax",
+  "label": "税收优惠",
+  "en": "Tax Incentives",
+  "icon": "🧾",
+  "seg": "pol",
+  "angle": 88
+ },
+ {
+  "id": "dr",
+  "label": "分时电价/需求响应补贴",
+  "en": "TOU Pricing & DR Subsidy",
+  "icon": "⏱️",
+  "seg": "pol",
+  "angle": 99
+ },
+ {
+  "id": "bond",
+  "label": "绿色债券/绿色金融政策",
+  "en": "Green Bonds & Green Finance Policy",
+  "icon": "📈",
+  "seg": "pol",
+  "angle": 110
+ },
+ {
+  "id": "equip",
+  "label": "设备更新专项/超长期国债",
+  "en": "Equipment Renewal & Special Bonds",
+  "icon": "🔧",
+  "seg": "pol",
+  "angle": 121
+ }
+];
+const SEG = {
+  up:  {name:"上游", sub:"清洁能源供给", color:"#2e9e4f", light:"#e6f3e7"},
+  mid: {name:"中游", sub:"运营与数字化", color:"#1565c0", light:"#e7f1fb"},
+  fin: {name:"金融服务", sub:"银行配套", color:"#00897b", light:"#e3f2f0"},
+  down:{name:"下游", sub:"收益与客户", color:"#7cb342", light:"#f0f7e6"},
+  risk:{name:"风险要点", sub:"合规与测算", color:"#00695c", light:"#e2efed"},
+  pol: {name:"政策补贴", sub:"支持与激励", color:"#e8912d", light:"#fdf1e0"},
+  center:{name:"零碳工厂", color:"#43a047"}
+};
+const LS_KEY = "zerocarbon_graph_v1";
+
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const o = JSON.parse(raw); if(o && o.data && typeof o.data === "object") return o.data; }
+  }catch(e){}
+  return null;
+}
+let data = loadLocal() || graphData;
+window.getData = function(){ return data; };  /* 调试/测试钩子 */
+let PRISTINE = "";
+window.getPristine = function(){ return PRISTINE; };  /* 调试/测试钩子 */
+let curLabel = null;
+let learned = [];
+try{ learned = JSON.parse(localStorage.getItem("zcf_learned") || "[]"); if(!Array.isArray(learned)) learned = []; }catch(e){ learned = []; }
+let enMode = false;
+
+/* ================= 地图渲染（沿用原布局） ================= */
+const CX=460, CY=460, R_NOD=330, R_BAND=185;
+const segOrder=[["mid",0,60],["pol",60,129],["fin",129,222],["risk",222,260],["down",260,298],["up",298,360]];
+const segMid={up:329,mid:30,pol:94,fin:175,risk:241,down:279};
+function pt(a,r){const t=a*Math.PI/180;return [CX+r*Math.sin(t), CY-r*Math.cos(t)];}
+function arc(a1,a2,r){const [x1,y1]=pt(a1,r),[x2,y2]=pt(a2,r);const lg=(a2-a1)>180?1:0;return `M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${lg} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;}
+
+const svg=document.getElementById("map");
+let svgHTML="";
+META.forEach(n=>{const [x,y]=pt(n.angle,R_NOD);svgHTML+=`<line x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#d7e6da" stroke-width="1.5"/>`;});
+segOrder.forEach(([s,a1,a2])=>{svgHTML+=`<path d="${arc(a1,a2,R_BAND)}" fill="none" stroke="${SEG[s].color}" stroke-width="44" stroke-linecap="butt" opacity="0.9"/>`;});
+Object.keys(segMid).forEach(s=>{const [x,y]=pt(segMid[s],R_BAND);svgHTML+=`<text class="blabel" x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" text-anchor="middle">${SEG[s].name}</text>`;});
+svgHTML+=`<g id="centerG"><circle class="cc" cx="${CX}" cy="${CY}" r="72" fill="#e8f5e9" stroke="${SEG.center.color}" stroke-width="3"/>`;
+svgHTML+=`<text class="center-title" x="${CX}" y="${CY-4}" text-anchor="middle">零碳</text><text class="center-title" x="${CX}" y="${CY+28}" text-anchor="middle">工厂</text></g>`;
+META.forEach((n,i)=>{
+  const [x,y]=pt(n.angle,R_NOD);const c=SEG[n.seg].color;
+  svgHTML+=`<g class="node" data-i="${i}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})">`;
+  svgHTML+=`<circle r="48" fill="transparent" style="pointer-events:all"/>`;
+  svgHTML+=`<circle class="nbg" r="36" fill="#fff" stroke="${c}" stroke-width="3"/>`;
+  svgHTML+=`<circle r="36" fill="${c}" opacity="0.10"/>`;
+  svgHTML+=`<text class="ico" x="0" y="9" text-anchor="middle">${n.icon}</text>`;
+  svgHTML+=`<text class="nlabel" x="0" y="56" text-anchor="middle">${n.label}</text>`;
+  svgHTML+=`</g>`;
+});
+svg.innerHTML=svgHTML;
+
+/* ================= 概览卡 ================= */
+function metaOf(label){ for(const m of META){ if(m.label===label) return m; } return null; }
+const grid=document.getElementById("grid");
+function renderGrid(){
+  grid.innerHTML = META.map((m,i)=>{
+    const d = data[m.label] || {category:"", aiLink:"", items:[]};
+    const c = SEG[m.seg].color;
+    return `<div class="ocard" data-i="${i}" data-id="${m.label}" style="border-left-color:${c}">
+      <div class="oc-h"><span class="emoji">${m.icon}</span>${m.label}</div>
+      <div class="oc-d">${(d.aiLink||"").slice(0,46)}${(d.aiLink||"").length>46?"…":""}</div>
+      <span class="oc-tag" style="background:${c}">${d.category||SEG[m.seg].name}</span>
+      <span style="font-size:11px;color:#8a9a90;margin-left:8px;">${(d.items||[]).length} 张卡片</span>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".ocard").forEach(c=>c.addEventListener("click",()=>openNode(META[+c.dataset.i].label)));
+  markCard();
+}
+
+/* ================= 通用 ================= */
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove("show"),1800); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function updateProgress(){const t=learned.length;document.getElementById("pgText").textContent=`已学习 ${t} / ${META.length}`;document.getElementById("pgBar").style.width=(t/META.length*100)+"%";}
+function markCard(){document.querySelectorAll(".ocard").forEach(c=>{const id=c.dataset.id;c.classList.toggle("done",learned.includes(id));});}
+
+/* ================= 面板：卡片流编辑器 ================= */
+function openNode(label){
+  curLabel = label;
+  const m = metaOf(label); if(!m) return;
+  const d = data[label] || {category:SEG[m.seg].name, aiLink:"", attachments:[], items:[]};
+  const c = SEG[m.seg].color;
+  const head=document.getElementById("pHead");
+  head.style.background=`linear-gradient(135deg,${c},${c}cc)`;
+  document.getElementById("pTitle").textContent = m.icon+" "+m.label;
+  document.getElementById("pEn").textContent = m.en;
+  document.getElementById("pTag").textContent = (d.category||SEG[m.seg].name)+" · "+SEG[m.seg].sub;
+  document.getElementById("pAiLink").textContent = "🧠 AI节能主线：" + (d.aiLink||"");
+  renderCards(d);
+  renderAttach(d);
+  const lb=document.getElementById("learnBtn");
+  if(lb){ lb.classList.toggle("done",learned.includes(label)); lb.textContent=learned.includes(label)?"✓ 已掌握":"✓ 标记已掌握"; }
+  document.getElementById("mask").classList.add("show");
+  document.getElementById("mask").dataset.label = label;
+}
+function renderCards(d){
+  const box=document.getElementById("pBody");
+  const items = d.items||[];
+  let h = "";
+  items.forEach((it,idx)=>{
+    h += `<div class="card" data-idx="${idx}">
+      <div class="card-t" contenteditable="true" data-k="title">${esc(it.title)}</div>
+      <div class="card-x" contenteditable="true" data-k="text">${esc(it.text)}</div>
+      <div class="card-b">
+        <button onclick="focusCard(${idx})">✏ 编辑</button>
+        <button class="del" onclick="delCard(${idx})">🗑 删除</button>
+      </div>
+    </div>`;
+  });
+  h += `<div class="addcard">
+    <input id="newTitle" placeholder="新卡片标题，如：改造方案 / 收益测算 / 尽调要点…">
+    <textarea id="newText" placeholder="新卡片内容：写具体方案、数据、步骤，宁长勿短"></textarea>
+    <button onclick="addCard()">＋ 添加卡片</button>
+  </div>
+  <button class="learned-btn" id="learnBtn" onclick="toggleLearned()">✓ 标记已掌握</button>
+  <div class="foot">注：卡片内容为在线编辑数据，保存后写入本机 localStorage；导出的 JSON / HTML 可跨设备传递。额度、利率、政策金额均为公开资料示例，实际以银行授信政策与最新监管规定为准。</div>`;
+  box.innerHTML = h;
+  box.querySelectorAll(".card-t,.card-x").forEach(el=>{
+    el.addEventListener("blur", function(){
+      const card = this.closest(".card"); const idx = +card.dataset.idx;
+      const d2 = data[curLabel]; if(!d2 || !d2.items || !d2.items[idx]) return;
+      const k = this.dataset.k === "title" ? "title" : "text";
+      const v = (this.innerText || this.textContent || "").replace(/\s+$/,"");
+      if(d2.items[idx][k] !== v){ d2.items[idx][k] = v; toast("已更新「"+d2.items[idx].title+"」"); }
+    });
+    el.addEventListener("keydown", function(e){ if(e.key==="Escape") this.blur(); });
+  });
+  const nt=document.getElementById("newTitle");
+  nt.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); document.getElementById("newText").focus(); } });
+}
+function renderAttach(d){
+  const box=document.getElementById("pBody");
+  const atts = d.attachments||[];
+  let h = `<div class="attach"><div class="at-t">📎 附件与文档（占位链接，路径 ./assets/，放入文件即可下载）</div>`;
+  if(atts.length===0) h += `<span style="font-size:12.5px;color:#8a9a90;">暂无附件</span>`;
+  atts.forEach(a=>{ h += `<a href="${esc(a.url)}" download="${esc(a.name)}">📄 ${esc(a.name)}</a>`; });
+  h += `</div>`;
+  box.insertAdjacentHTML("beforeend", h);
+}
+function focusCard(idx){ const c=document.querySelector(`.card[data-idx="${idx}"] .card-x`); if(c){ c.focus(); try{ document.execCommand && document.execCommand("selectAll",false,null); }catch(e){} } }
+function delCard(idx){
+  const d=data[curLabel]; if(!d||!d.items||!d.items[idx]) return;
+  if(!confirm("删除卡片「"+d.items[idx].title+"」？删除后需点「保存」生效，也可「重置」恢复默认。")) return;
+  d.items.splice(idx,1);
+  d.items.forEach((it,i)=>{ it.id=i+1; });
+  renderCards(d); renderAttach(d);
+  toast("已删除，别忘了点「保存」");
+}
+function addCard(){
+  const t=document.getElementById("newTitle").value.trim();
+  const x=document.getElementById("newText").value.trim();
+  if(!t){ toast("请先填写卡片标题"); document.getElementById("newTitle").focus(); return; }
+  if(!x){ toast("请填写卡片内容"); document.getElementById("newText").focus(); return; }
+  const d=data[curLabel];
+  if(!d.items) d.items=[];
+  const nid = d.items.reduce((m,it)=>Math.max(m, it.id||0),0)+1;
+  d.items.push({id:nid, title:t, text:x});
+  document.getElementById("newTitle").value=""; document.getElementById("newText").value="";
+  renderCards(d); renderAttach(d);
+  toast("已添加卡片，点「保存」写入本机");
+}
+function closePanel(){document.getElementById("mask").classList.remove("show");}
+function navNode(d){
+  const cur=META.findIndex(m=>m.label===(document.getElementById("mask").dataset.label||curLabel));
+  if(cur<0) return;
+  const ni=(cur+d+META.length)%META.length;
+  openNode(META[ni].label);
+}
+function toggleLearned(){
+  const label=document.getElementById("mask").dataset.label; if(!label) return;
+  const pos=learned.indexOf(label);
+  if(pos>=0) learned.splice(pos,1); else learned.push(label);
+  try{localStorage.setItem("zcf_learned",JSON.stringify(learned));}catch(e){}
+  updateProgress(); markCard();
+  const lb=document.getElementById("learnBtn");
+  lb.classList.toggle("done",learned.includes(label));
+  lb.textContent=learned.includes(label)?"✓ 已掌握":"✓ 标记已掌握";
+}
+
+/* ================= 保存 / 导入导出 / 重置 ================= */
+function saveData(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({savedAt:new Date().toISOString(), data:data}));
+    toast("已保存到本机（zerocarbon_graph_v1）");
+  }catch(e){ toast("保存失败："+e.message); }
+}
+function download(name, text, mime){
+  const blob=new Blob([text],{type:mime||"application/octet-stream"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),3000);
+}
+function exportJSON(){ download("零碳工厂AI节能图谱数据.json", JSON.stringify(data,null,2), "application/json"); toast("已导出 JSON"); }
+document.getElementById("importFile").addEventListener("change", function(e){
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=function(){
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj || typeof obj!=="object" || Array.isArray(obj)) throw new Error("格式不正确");
+      let ok=0;
+      for(const k in obj){ if(obj[k] && Array.isArray(obj[k].items)) ok++; }
+      if(ok===0) throw new Error("未找到任何含 items 的节点");
+      data=obj; renderGrid();
+      toast("导入成功："+ok+" 个节点");
+    }catch(err){ toast("导入失败："+err.message); }
+    e.target.value="";
+  };
+  r.readAsText(f,"utf-8");
+});
+function exportHTML(){
+  const s=PRISTINE;
+  const marker="const graphData = ";
+  const i=s.indexOf(marker);
+  const j = i>=0 ? s.indexOf(";\nconst META", i) : -1;
+  if(i<0||j<0){ toast("导出失败：未找到数据锚点，请改用手动导出 JSON"); return; }
+  const out = s.slice(0,i) + marker + JSON.stringify(data,null,1) + s.slice(j);
+  download("零碳工厂生态图谱_AI节能版.html", out, "text/html");
+  toast("已导出新版 HTML（含当前编辑数据）");
+}
+function resetData(){
+  if(!confirm("确认重置？将清空本机所有编辑（localStorage: zerocarbon_graph_v1），恢复图谱默认内容。")) return;
+  if(!confirm("再次确认：重置后本地新增/修改的卡片不可恢复，是否继续？")) return;
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  location.reload();
+}
+
+/* ================= 交互绑定 ================= */
+document.querySelectorAll(".node").forEach(g=>g.addEventListener("click",()=>openNode(META[+g.dataset.i].label)));
+document.getElementById("centerG").addEventListener("click",()=>{alert("零碳工厂是整张图谱的中心：上游供绿电、AI节能挤出冗余、虚拟电厂参与市场、绿色金融配资金、补贴免税增利润、风险控制守底线。点击四周图标逐个学习吧！");});
+document.getElementById("mask").addEventListener("click",e=>{if(e.target.id==="mask")closePanel();});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape")closePanel();
+  if(document.getElementById("mask").classList.contains("show")){
+    if(e.key==="ArrowRight"&&document.activeElement===document.body)navNode(1);
+    if(e.key==="ArrowLeft"&&document.activeElement===document.body)navNode(-1);
+  }
+});
+document.getElementById("search").addEventListener("input",e=>{
+  const q=e.target.value.trim().toLowerCase();
+  const hit=[];
+  META.forEach((m,i)=>{
+    const d=data[m.label]||{};
+    const hay=(m.label+m.en+(d.aiLink||"")+(d.items||[]).map(it=>it.title+it.text).join("")).toLowerCase();
+    const ok=!q||hay.includes(q);
+    const g=document.querySelector(`.node[data-i="${i}"]`);
+    if(g) g.style.opacity=ok?1:0.18;
+    if(ok) hit.push(m.label);
+  });
+  document.querySelectorAll(".ocard").forEach(c=>{
+    c.style.display = (!q || hit.includes(c.dataset.id)) ? "" : "none";
+  });
+});
+document.getElementById("enBtn").addEventListener("click",function(){
+  enMode=!enMode; this.classList.toggle("on",enMode);
+  document.querySelectorAll(".nlabel").forEach((t,i)=>{ t.textContent=enMode?META[i].en:META[i].label; });
+});
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(confirm("确认清空学习进度？（不影响卡片编辑数据）")){
+    learned=[]; try{localStorage.removeItem("zcf_learned");}catch(e){}
+    updateProgress(); markCard();
+  }
+});
+document.getElementById("jsonBtn").addEventListener("click",()=>{
+  const out=META.map(m=>{ const d=data[m.label]||{}; return {节点:m.label, 分类:d.category, AI节能主线:d.aiLink, 卡片:d.items}; });
+  download("零碳工厂AI节能节点数据.json", JSON.stringify(out,null,2), "application/json");
+  toast("已导出节点数据 JSON");
+});
+
+renderGrid();
+updateProgress(); markCard();
+PRISTINE = document.documentElement.outerHTML;
+</script>
+</body>
+</html>
